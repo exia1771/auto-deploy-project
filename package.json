@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.8.2",
+    "eslint-plugin-html": "^6.1.1",
     "vue": "^2.6.12",
     "vue-router": "^3.4.9",
     "vuex": "^3.6.0"
