@@ -1,11 +1,11 @@
 <template>
-  <div>页面不存在</div>
+  <div>注册</div>
 </template>
 
 
 <script>
 export default {
-  name: "NotFound",
+  name: "SubmitComponent",
 };
 </script>
 

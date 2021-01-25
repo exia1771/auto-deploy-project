@@ -1,11 +1,11 @@
 <template>
-  <div>页面不存在</div>
+  <div>登录</div>
 </template>
 
 
 <script>
 export default {
-  name: "NotFound",
+  name: "LoginComponent",
 };
 </script>
 

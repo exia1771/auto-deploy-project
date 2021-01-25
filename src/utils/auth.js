@@ -11,7 +11,10 @@ export function getToken() {
 }
 
 export function getUsername() {
-    return "null";
+    if (getToken() === null) {
+        return null;
+    }
+    return null;
 }
 
 export function setToken(token) {

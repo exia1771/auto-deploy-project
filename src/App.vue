@@ -27,6 +27,19 @@ html {
   margin: 0;
   padding: 0;
   height: 100%;
+  --base: calc(100vw / 24);
+}
+
+img {
+  display: block;
+}
+
+.box-shadow {
+  box-shadow: 0px 2px 4px 3px var(--cb-color-shadow, rgba(0, 0, 0, 0.16));
+}
+
+:root {
+  font-size: var(--base);
 }
 
 .max-height {

@@ -1,19 +1,17 @@
 <template>
   <div id="frame-container" class="max-height">
-    <div id="frame" class="max-height">
-      <section id="top-frame">
-        <page-header></page-header>
-      </section>
+    <div id="top-frame">
+      <page-header></page-header>
+    </div>
 
-      <div id="bottom-frame" class="max-height">
-        <section id="left-frame" @mousedown="sideBarSpread">
-          <page-side-bar ref="sideBar" :collapseState="isCollapse" />
-        </section>
+    <div id="bottom-frame">
+      <div id="left-frame" @mousedown="sideBarSpread">
+        <page-side-bar ref="sideBar" />
+      </div>
 
-        <section id="right-frame" @mousedown="sideBarCollapse">
-          <section id="right-frame-content">
-            <router-view />
-          </section>
+      <div id="right-frame" @mousedown="sideBarCollapse" class="box-shadow">
+        <section id="right-frame-content">
+          <router-view />
         </section>
       </div>
     </div>
@@ -31,9 +29,7 @@ export default {
     PageHeader,
   },
   data() {
-    return {
-      isCollapse: true,
-    };
+    return {};
   },
   methods: {
     sideBarSpread() {
@@ -48,24 +44,19 @@ export default {
 
 
 <style scoped>
-#frame {
+#frame-container {
   display: flex;
   flex-direction: column;
 }
 
-#top-frame {
-  box-shadow: 0 2px 4px 0 var(--cb-color-shadow, rgba(0, 0, 0, 0.16));
-  position: fixed;
-  z-index: 1;
-  width: 100%;
-  top: 0;
-}
-
 #bottom-frame {
+  margin-top: calc(var(--base) / 6);
   display: flex;
+  flex: 1;
 }
 
 #right-frame {
+  margin-left: calc(var(--base) / 6);
   flex: 1;
 }
 </style>
