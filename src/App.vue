@@ -35,7 +35,7 @@ img {
 }
 
 .box-shadow {
-  box-shadow: 0px 2px 4px 3px var(--cb-color-shadow, rgba(0, 0, 0, 0.16));
+  box-shadow: 0px 2px 4px 3px rgba(0, 0, 0, 0.16);
 }
 
 :root {

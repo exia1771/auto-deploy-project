@@ -67,7 +67,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 1.2rem;
 }
 
 .center-items-container {

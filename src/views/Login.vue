@@ -12,7 +12,11 @@
       <div id="login-grid-header">
         <div
           id="login-grid-login"
-          class="login-header-flex"
+          :class="
+            active.login === true
+              ? 'login-header-flex active'
+              : 'login-header-flex'
+          "
           @click="changeGridContent('LoginComponent')"
         >
           <div>
@@ -22,7 +26,11 @@
         </div>
         <div
           id="login-grid-submit"
-          class="login-header-flex"
+          :class="
+            active.submit === true
+              ? 'login-header-flex active'
+              : 'login-header-flex'
+          "
           @click="changeGridContent('SubmitComponent')"
         >
           <div>
@@ -53,11 +61,22 @@ export default {
     return {
       componentId: "LoginComponent",
       posterPath: require("../../src/assets/poster.png"),
+      active: {
+        login: true,
+        submit: false,
+      },
     };
   },
   methods: {
     changeGridContent(id) {
       this.componentId = id;
+      if (id === "LoginComponent") {
+        this.active.login = true;
+        this.active.submit = false;
+      } else if (id === "SubmitComponent") {
+        this.active.login = false;
+        this.active.submit = true;
+      }
     },
   },
   mounted() {
@@ -76,17 +95,22 @@ export default {
   right: 10%;
   top: 15%;
   display: grid;
-  width: 8.1375rem;
-  height: 8.75rem;
-  grid-template-rows: 10% 80%;
+  width: 7.5rem;
+  height: 7rem;
+  grid-template-rows: 10% 90%;
 }
 
 #login-grid-header {
   display: flex;
   border-bottom: 1px solid #dddddd;
-  font-size: 0.4rem;
+  font-size: 0.3rem;
   color: #666666;
   cursor: pointer;
+}
+
+.active {
+  color: #0099ff;
+  border-bottom: 1px solid #0099ff;
 }
 
 #login-grid-header :hover {
@@ -114,7 +138,12 @@ export default {
 
 #image-poster {
   position: fixed;
-  top: 30%;
-  left: 5%;
+  top: 25%;
+  left: 15%;
+}
+
+#image-poster img {
+  width: 6.25rem;
+  height: 3.75rem;
 }
 </style>

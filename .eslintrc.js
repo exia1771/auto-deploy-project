@@ -1,7 +1,11 @@
 module.exports = {
   root: true,
   env: {
-    browser: true
+    browser: true,
+    node: true
+  },
+  globals: {
+    require: true
   },
   extends: ["plugin:vue/essential", "eslint:recommended"],
   parserOptions: {
@@ -14,11 +18,6 @@ module.exports = {
   ],
   // add your custom rules here
   'rules': {
-    // 单引号引用字符串
-    'quotes': [
-      'error',
-      'single'
-    ],
     // 必须使用分号结束
     'semi': [
       'error',
