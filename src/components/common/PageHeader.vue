@@ -36,7 +36,6 @@
 
 
 <script>
-import { getUsername } from "../../utils/auth";
 export default {
   name: "PageHeader",
   data() {
@@ -55,7 +54,7 @@ export default {
   },
   computed: {
     username() {
-      return getUsername();
+      return "";
     },
   },
 };

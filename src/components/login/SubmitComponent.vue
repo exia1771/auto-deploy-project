@@ -48,29 +48,32 @@
 
 <script>
 import { doSubmit, doCheckSameName } from "/src/service/login";
+import { setToken } from "../../utils/auth";
 export default {
   name: "SubmitComponent",
   data() {
+    const PASSWORD_NOT_SAME = "两次输入的密码不一致!";
+    const USER_NAME_EXISTED = "已存在的用户名!";
     const checkPassword = (rule, value, callback) => {
       if (value !== this.submitForm.password) {
-        callback(new Error("两次输入的密码不一致!"));
+        callback(new Error(PASSWORD_NOT_SAME));
       } else {
         callback();
       }
     };
     const checkSameName = (rule, value, callback) => {
       if (this.existedName[value] === true) {
-        callback(new Error("已存在的用户名!"));
+        callback(new Error(USER_NAME_EXISTED));
         return;
       }
-      console.log(this.existedName);
       if (3 <= value.length && value.length <= 255) {
         doCheckSameName(value)
           .then(() => {
             callback();
           })
-          .catch(() => {
-            callback(new Error("用户名已经存在!"));
+          .catch((error) => {
+            console.log(error.response);
+            callback(new Error(error.response.data.message));
             this.existedName[value] = true;
           });
       }
@@ -133,8 +136,10 @@ export default {
       }
       this.isSubmit = true;
       doSubmit(this.submitForm)
-        .then(() => {
+        .then((res) => {
           this.isSubmit = false;
+          setToken(res.data.data.token);
+          this.$router.push({ name: "Index" });
         })
         .catch(() => {
           this.isSubmit = false;

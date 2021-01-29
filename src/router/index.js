@@ -1,9 +1,10 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import { getUsername } from '../utils/auth';
-import { routes, login, index } from './route'
+import { getToken } from '../utils/auth';
+import { routes, deploy, index, login } from './route';
 
 Vue.use(VueRouter);
+
 
 const router = new VueRouter({
 	mode: 'history',
@@ -11,9 +12,10 @@ const router = new VueRouter({
 	routes
 });
 
+
 // 前置守卫
 router.beforeEach((to, from, next) => {
-	if (getUsername() === null) {
+	if (getToken() === null) {
 		if (to.path === login.path) {
 			next();
 		} else {
@@ -21,7 +23,7 @@ router.beforeEach((to, from, next) => {
 		}
 	} else {
 		if (to.path === login.path) {
-			next(index.path)
+			next(deploy + index.path);
 		} else {
 			next();
 		}
@@ -29,7 +31,7 @@ router.beforeEach((to, from, next) => {
 });
 
 // 后置守卫
-router.afterEach(route => {
+router.afterEach(() => {
 
 });
 

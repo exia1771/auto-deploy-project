@@ -1,22 +1,14 @@
 <template>
   <div id="app" class="max-height">
-    <frame v-if="isLogin"></frame>
-    <router-view v-else />
+    <router-view />
   </div>
 </template>
 
 <script>
-import Frame from "./views/Frame";
-import { getUsername } from "./utils/auth";
-
 export default {
-  components: {
-    Frame,
-  },
-  computed: {
-    isLogin() {
-      return getUsername() !== null;
-    },
+  components: {},
+  data() {
+    return {};
   },
 };
 </script>
@@ -28,6 +20,14 @@ html {
   padding: 0;
   height: 100%;
   --base: calc(100vw / 24);
+}
+
+@media screen and (max-width: 1024px) {
+  body,
+  html {
+    min-width: 1024px;
+    --base: 42.67px;
+  }
 }
 
 img {

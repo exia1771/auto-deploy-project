@@ -5,44 +5,46 @@
         <div>登录</div>
       </template>
     </page-header>
-    <div id="image-poster">
-      <img :src="posterPath" />
-    </div>
-    <div id="login-grid" class="box-shadow">
-      <div id="login-grid-header">
-        <div
-          id="login-grid-login"
-          :class="
-            active.login === true
-              ? 'login-header-flex active'
-              : 'login-header-flex'
-          "
-          @click="changeGridContent('LoginComponent')"
-        >
-          <div>
-            <i class="el-icon-user"></i>
-          </div>
-          <div class="">登录</div>
-        </div>
-        <div
-          id="login-grid-submit"
-          :class="
-            active.submit === true
-              ? 'login-header-flex active'
-              : 'login-header-flex'
-          "
-          @click="changeGridContent('SubmitComponent')"
-        >
-          <div>
-            <i class="el-icon-s-custom"></i>
-          </div>
-          <div>注册</div>
-        </div>
+    <div id="login-bottom">
+      <div id="image-poster">
+        <img :src="posterPath" />
       </div>
-      <div id="login-grid-content">
-        <keep-alive>
-          <component :is="componentId"></component>
-        </keep-alive>
+      <div id="login-grid" class="box-shadow">
+        <div id="login-grid-header">
+          <div
+            id="login-grid-login"
+            :class="
+              active.login === true
+                ? 'login-header-flex active'
+                : 'login-header-flex'
+            "
+            @click="changeGridContent('LoginComponent')"
+          >
+            <div>
+              <i class="el-icon-user"></i>
+            </div>
+            <div class="">登录</div>
+          </div>
+          <div
+            id="login-grid-submit"
+            :class="
+              active.submit === true
+                ? 'login-header-flex active'
+                : 'login-header-flex'
+            "
+            @click="changeGridContent('SubmitComponent')"
+          >
+            <div>
+              <i class="el-icon-s-custom"></i>
+            </div>
+            <div>注册</div>
+          </div>
+        </div>
+        <div id="login-grid-content">
+          <keep-alive>
+            <component :is="componentId"></component>
+          </keep-alive>
+        </div>
       </div>
     </div>
   </div>
@@ -90,11 +92,14 @@ export default {
 
 
 <style scoped>
+#login-bottom {
+  display: flex;
+  margin-top: 1.5rem;
+}
+
 #login-grid {
-  position: fixed;
-  right: 10%;
-  top: 15%;
   display: grid;
+  margin-left: 3rem;
   width: 7.5rem;
   height: 7rem;
   grid-template-rows: 10% 90%;
@@ -137,9 +142,8 @@ export default {
 }
 
 #image-poster {
-  position: fixed;
-  top: 25%;
-  left: 15%;
+  margin-top: 1.4rem;
+  margin-left: 3rem;
 }
 
 #image-poster img {

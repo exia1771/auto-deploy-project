@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-const TOKEN_KEY = 'Authorization';
+export const TOKEN_KEY = 'Authorization';
 
 export function getToken() {
     const token = Cookies.get(TOKEN_KEY);
@@ -8,13 +8,6 @@ export function getToken() {
         return null;
     }
     return token;
-}
-
-export function getUsername() {
-    if (getToken() === null) {
-        return null;
-    }
-    return null;
 }
 
 export function setToken(token) {

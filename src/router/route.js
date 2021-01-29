@@ -4,8 +4,10 @@ export const login = {
     component: () => import("../views/Login.vue")
 };
 
+export const deploy = "/deploy/";
+
 export const index = {
-    path: "/index",
+    path: "index",
     name: "Index",
     component: () => import("../views/Index.vue")
 };
@@ -13,13 +15,21 @@ export const index = {
 export const routes = [
     {
         path: "/",
-        redirect: index.path
+        redirect: login.path
     },
     login,
-    index,
+    {
+        path: "/deploy",
+        name: "Deploy",
+        redirect: "index",
+        component: () => import("../views/Frame.vue"),
+        children: [
+            index,
+        ]
+    },
     {
         path: "*",
         name: "NotFound",
         component: () => import("../views/404.vue")
-    }
+    },
 ];

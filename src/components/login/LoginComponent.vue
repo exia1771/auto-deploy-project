@@ -13,7 +13,11 @@
       </el-form-item>
 
       <el-form-item prop="password" id="login-password-container">
-        <el-input v-model="loginForm.password" placeholder="密码"></el-input>
+        <el-input
+          type="password"
+          v-model="loginForm.password"
+          placeholder="密码"
+        ></el-input>
       </el-form-item>
 
       <el-button
@@ -31,6 +35,8 @@
 
 <script>
 import { doLogin } from "../../service/login";
+import { setToken } from "../../utils/auth";
+
 export default {
   name: "LoginComponent",
   data() {
@@ -64,6 +70,7 @@ export default {
   },
   methods: {
     login() {
+      const that = this;
       let validResult = true;
       this.$refs.loginForm.validate((valid) => {
         if (!valid) {
@@ -76,8 +83,10 @@ export default {
       }
       this.isLogin = true;
       doLogin(this.loginForm)
-        .then(() => {
+        .then((res) => {
           this.isLogin = false;
+          setToken(res.data.data.token);
+          that.$router.replace({ name: "Index" });
         })
         .catch(() => {
           this.isLogin = false;
