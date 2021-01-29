@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div id="header-menu-avatar-container" v-show="username !== null">
+    <div id="header-menu-avatar-container" v-show="isShow">
       <div id="header-menu" class="center-items-container"></div>
       <el-dropdown trigger="click">
         <el-avatar
@@ -25,8 +25,9 @@
           <el-dropdown-item>
             <i class="el-icon-user icon-margin-right"></i>管理您的账号
           </el-dropdown-item>
-          <el-dropdown-item>
-            <i class="el-icon-switch-button icon-margin-right"></i>注销
+          <el-dropdown-item id="logout-item">
+            <i class="el-icon-switch-button icon-margin-right"></i>
+            注销
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -36,6 +37,8 @@
 
 
 <script>
+import { removeToken, removeUserId } from "../../utils/auth.js";
+import { doLogout } from "../../service/login";
 export default {
   name: "PageHeader",
   data() {
@@ -51,10 +54,23 @@ export default {
     changeSlotStyle(style) {
       this.slotStyle = style;
     },
+    logout() {
+      let that = this;
+      let item = document.getElementById("logout-item");
+      item.onclick = async function () {
+        await doLogout().catch(() => {});
+        removeToken();
+        removeUserId();
+        that.$router.replace({ name: "Login" });
+      };
+    },
+  },
+  mounted() {
+    this.logout();
   },
   computed: {
-    username() {
-      return "";
+    isShow() {
+      return this.$route.name != "Login";
     },
   },
 };

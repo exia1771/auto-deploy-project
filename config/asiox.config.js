@@ -1,15 +1,22 @@
 import axios from 'axios'
 import vue from '/src/main.js'
-import { getToken, TOKEN_KEY } from "../src/utils/auth";
+import { getToken, setToken, TOKEN_KEY } from "../src/utils/auth";
+import { PUBLIC_USER_PATH } from "../src/service/login";
 
-const CHECK_NAME_URL = "http://localhost:8081/user/check"
+const CHECK_NAME_URL = PUBLIC_USER_PATH + "/check"
 
 axios.interceptors.request.use((config) => {
-    config.headers[TOKEN_KEY] = "Bearer " + getToken();
+    if (getToken() != null) {
+        config.headers[TOKEN_KEY] = "Bearer " + getToken();
+    }
     return config;
 });
 
 axios.interceptors.response.use((res) => {
+    const tokenInRes = res.headers[TOKEN_KEY.toLowerCase()];
+    if (tokenInRes != null || tokenInRes != undefined) {
+        setToken(tokenInRes);
+    }
     return Promise.resolve(res);
 }, (error) => {
     // 注册时的校验取消消息提示

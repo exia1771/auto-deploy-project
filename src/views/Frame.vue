@@ -22,8 +22,7 @@
 <script>
 import PageHeader from "../components/common/PageHeader";
 import PageSideBar from "../components/common/PageSideBar";
-import { getToken } from "../utils/auth";
-import { doAutoLogin } from "../service/login.js";
+import { autoLogin } from "../service/login.js";
 
 export default {
   components: {
@@ -40,25 +39,15 @@ export default {
     sideBarCollapse() {
       this.$refs.sideBar.collapse();
     },
-    async autoLogin() {
-      if (getToken() === null) {
-        this.isLogin = false;
-      } else {
-        await doAutoLogin(getToken())
-          .then(() => {
-            this.isLogin = true;
-          })
-          .catch(() => {
-            this.isLogin = false;
-          });
-        if (this.isLogin === false) {
-          this.$router.push({ name: "Index" });
-        }
+    async login() {
+      let result = await autoLogin();
+      if (result === false) {
+        this.$router.replace({ name: "Login" });
       }
     },
   },
-  async created() {
-    await this.autoLogin();
+  created() {
+    this.login();
   },
 };
 </script>

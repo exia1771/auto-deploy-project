@@ -55,6 +55,7 @@
 import PageHeader from "../components/common/PageHeader.vue";
 import LoginComponent from "../components/login/LoginComponent";
 import SubmitComponent from "../components/login/SubmitComponent";
+import { autoLogin } from "../service/login.js";
 
 export default {
   components: { PageHeader, LoginComponent, SubmitComponent },
@@ -80,6 +81,14 @@ export default {
         this.active.submit = true;
       }
     },
+    async login() {
+      if ((await autoLogin()) === true) {
+        this.$router.replace({ name: "Index" });
+      }
+    },
+  },
+  created() {
+    this.login();
   },
   mounted() {
     this.$refs.pageHeader.changeSlotStyle({

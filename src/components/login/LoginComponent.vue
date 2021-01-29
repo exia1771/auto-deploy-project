@@ -35,7 +35,7 @@
 
 <script>
 import { doLogin } from "../../service/login";
-import { setToken } from "../../utils/auth";
+import { setToken, setUserId } from "../../utils/auth";
 
 export default {
   name: "LoginComponent",
@@ -69,7 +69,7 @@ export default {
     };
   },
   methods: {
-    login() {
+    async login() {
       const that = this;
       let validResult = true;
       this.$refs.loginForm.validate((valid) => {
@@ -82,10 +82,11 @@ export default {
         return;
       }
       this.isLogin = true;
-      doLogin(this.loginForm)
+      await doLogin(this.loginForm)
         .then((res) => {
           this.isLogin = false;
           setToken(res.data.data.token);
+          setUserId(res.data.data.id);
           that.$router.replace({ name: "Index" });
         })
         .catch(() => {
@@ -96,7 +97,7 @@ export default {
 };
 </script>
 
-
+  
 <style scoped>
 #login-title {
   font-size: 0.32rem;
