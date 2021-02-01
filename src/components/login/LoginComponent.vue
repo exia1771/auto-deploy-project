@@ -35,7 +35,7 @@
 
 <script>
 import { doLogin } from "../../service/login";
-import { setToken, setUserId } from "../../utils/auth";
+import { setUser } from "../../utils/auth";
 
 export default {
   name: "LoginComponent",
@@ -85,9 +85,8 @@ export default {
       await doLogin(this.loginForm)
         .then((res) => {
           this.isLogin = false;
-          setToken(res.data.data.token);
-          setUserId(res.data.data.id);
-          that.$router.replace({ name: "Index" });
+          setUser(res.data.data);
+          that.$router.replace({ name: "Index", params: { fromLogin: true } });
         })
         .catch(() => {
           this.isLogin = false;

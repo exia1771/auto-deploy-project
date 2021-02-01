@@ -23,7 +23,7 @@
             <div>
               <i class="el-icon-user"></i>
             </div>
-            <div class="">登录</div>
+            <div>登录</div>
           </div>
           <div
             id="login-grid-submit"
@@ -82,19 +82,14 @@ export default {
       }
     },
     async login() {
-      if ((await autoLogin()) === true) {
-        this.$router.replace({ name: "Index" });
+      let result = await autoLogin();
+      if (result === true) {
+        this.$router.replace({ name: "Index", params: { fromLogin: true } });
       }
     },
   },
   created() {
     this.login();
-  },
-  mounted() {
-    this.$refs.pageHeader.changeSlotStyle({
-      color: "#000033",
-      margin: "0 0 0 20px",
-    });
   },
 };
 </script>

@@ -1,12 +1,15 @@
 import Cookies from 'js-cookie';
-import { doAutoLogin } from "../service/login";
+import vue from '/src/main.js';
 
 export const TOKEN_KEY = 'Authorization';
+export const TOKEN_PREFIX = 'Bearer ';
 export const USER_KEY = 'userid';
 
+const DOMAIN = "localhost";
+const PATH = "/";
 
 export function getToken() {
-    const token = Cookies.get(TOKEN_KEY);
+    const token = Cookies.get(TOKEN_KEY, { domain: DOMAIN, path: PATH });
     if (token === undefined || token === null || token.trim().length === 0) {
         return null;
     }
@@ -14,29 +17,19 @@ export function getToken() {
 }
 
 export function setToken(token) {
-    Cookies.set(TOKEN_KEY, token);
+    Cookies.set(TOKEN_KEY, TOKEN_PREFIX + token, { domain: DOMAIN, path: PATH });
 }
+
 
 export function removeToken() {
-    Cookies.remove(TOKEN_KEY);
+    Cookies.remove(TOKEN_KEY, { domain: DOMAIN, path: PATH });
 }
 
 
-export function getUserId() {
-    const userId = Cookies.get(USER_KEY);
-    if (userId === undefined || userId === null || userId.length === 0) {
-        doAutoLogin().then((res) => {
-            setUserId(res.data.data.id);
-            return res.data.data.id;
-        });
-    }
-    return userId;
+export function getUser() {
+    return vue.$store.state.user;
 }
 
-export function setUserId(user) {
-    Cookies.set(USER_KEY, user);
-}
-
-export function removeUserId() {
-    Cookies.remove(USER_KEY);
+export function setUser(user) {
+    vue.$store.commit("setUser", user);
 }

@@ -1,6 +1,7 @@
 import axios from '../../config/asiox.config';
 import { ROOT_SERVER_URL } from '/config/global';
-import { getToken, removeToken, removeUserId } from '../utils/auth';
+import { getToken, removeToken, setUser } from '../utils/auth';
+import vue from '/src/main.js';
 
 export const USER_PATH = ROOT_SERVER_URL + "/user";
 export const PUBLIC_USER_PATH = USER_PATH + "/public";
@@ -16,14 +17,17 @@ export async function doAutoLogin() {
 export async function autoLogin() {
     let isLogin = false;
     if (getToken() === null) {
+        if (vue.$route.name !== "Login") {
+            vue.$router.replace({ name: "Login" });
+        }
         return isLogin;
     }
-    await doAutoLogin().then(() => {
+    await doAutoLogin().then((res) => {
         isLogin = true;
+        setUser(res.data.data);
     }).catch(() => {
-        isLogin = false;
         removeToken();
-        removeUserId();
+        vue.$router.replace({ name: "Login" });
     });
     return isLogin;
 }
@@ -39,3 +43,4 @@ export async function doLogout() {
 export async function doCheckSameName(name) {
     return axios.get(PUBLIC_USER_PATH + "/check" + "?name=" + name);
 }
+

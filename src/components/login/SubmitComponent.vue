@@ -48,7 +48,6 @@
 
 <script>
 import { doSubmit, doCheckSameName } from "/src/service/login";
-import { setToken } from "../../utils/auth";
 export default {
   name: "SubmitComponent",
   data() {
@@ -136,10 +135,9 @@ export default {
       }
       this.isSubmit = true;
       doSubmit(this.submitForm)
-        .then((res) => {
+        .then(() => {
           this.isSubmit = false;
-          setToken(res.data.data.token);
-          this.$router.push({ name: "Index" });
+          this.$router.push({ name: "Index", params: { fromLogin: true } });
         })
         .catch(() => {
           this.isSubmit = false;

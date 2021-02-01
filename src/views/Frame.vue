@@ -1,16 +1,20 @@
 <template>
   <div id="frame-container" class="max-height">
     <div id="top-frame">
-      <page-header></page-header>
+      <page-header>
+        <template v-slot:title>
+          <div>{{ headerTitle }}</div>
+        </template>
+      </page-header>
     </div>
 
     <div id="bottom-frame">
       <div id="left-frame" @mousedown="sideBarSpread">
-        <page-side-bar ref="sideBar" />
+        <page-side-bar :list="menuList" ref="sideBar" />
       </div>
 
       <div id="right-frame" @mousedown="sideBarCollapse" class="box-shadow">
-        <section id="right-frame-content">
+        <section id="right-frame-content" class="max-height">
           <router-view />
         </section>
       </div>
@@ -32,6 +36,18 @@ export default {
   data() {
     return {};
   },
+  props: {
+    menuList: {
+      type: Array,
+      default: function () {
+        return [];
+      },
+    },
+    headerTitle: {
+      type: String,
+      default: "",
+    },
+  },
   methods: {
     sideBarSpread() {
       this.$refs.sideBar.spread();
@@ -40,10 +56,10 @@ export default {
       this.$refs.sideBar.collapse();
     },
     async login() {
-      let result = await autoLogin();
-      if (result === false) {
-        this.$router.replace({ name: "Login" });
+      if (this.$route.params.fromLogin === true) {
+        return;
       }
+      await autoLogin();
     },
   },
   created() {
@@ -68,5 +84,9 @@ export default {
 #right-frame {
   margin-left: calc(var(--base) / 6);
   flex: 1;
+}
+
+#right-frame-content {
+  padding: 5px;
 }
 </style>

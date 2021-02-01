@@ -24,7 +24,20 @@ export const routes = [
         redirect: "index",
         component: () => import("../views/Frame.vue"),
         children: [
-            index,
+            index
+        ]
+    },
+    {
+        path: "/account",
+        name: "Account",
+        redirect: "/account/profile",
+        component: () => import("../views/Account.vue"),
+        children: [
+            {
+                path: "profile",
+                name: "Profile",
+                component: () => import("../views/account/Profile.vue")
+            }
         ]
     },
     {

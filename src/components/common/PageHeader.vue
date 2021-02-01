@@ -4,7 +4,7 @@
       <div id="header-logo">
         <img :src="logo.path" />
       </div>
-      <div id="header-title" class="center-items-container">
+      <div id="header-title" class="center-items-container" @click="toIndex">
         <div>Auto Deploy Platform</div>
         <div :style="slotStyle">
           <slot name="title"></slot>
@@ -15,14 +15,21 @@
     <div id="header-menu-avatar-container" v-show="isShow">
       <div id="header-menu" class="center-items-container"></div>
       <el-dropdown trigger="click">
-        <el-avatar
-          id="header-avatar"
-          class="center-items-container"
-          icon="el-icon-user-solid"
-        >
-        </el-avatar>
+        <div>
+          <img
+            v-if="user.avatarAddress"
+            :src="user.avatarAddress"
+            class="avatar"
+            id="avatar-img"
+          />
+          <el-avatar
+            v-else
+            :size="avatarSize"
+            icon="el-icon-user-solid"
+          ></el-avatar>
+        </div>
         <el-dropdown-menu slot="dropdown" class="dropdown-menu">
-          <el-dropdown-item>
+          <el-dropdown-item id="manage-account-item">
             <i class="el-icon-user icon-margin-right"></i>管理您的账号
           </el-dropdown-item>
           <el-dropdown-item id="logout-item">
@@ -37,17 +44,23 @@
 
 
 <script>
-import { removeToken, removeUserId } from "../../utils/auth.js";
+import { removeToken } from "../../utils/auth.js";
 import { doLogout } from "../../service/login";
 export default {
   name: "PageHeader",
+  components: {},
   data() {
     return {
       logo: {
         path: require("/src/assets/logo.jpg"),
         style: {},
+        avatarSize: 50,
       },
-      slotStyle: {},
+      slotStyle: {
+        color: "#000033",
+        margin: "0 0 0 20px",
+      },
+      isShowProfile: false,
     };
   },
   methods: {
@@ -60,17 +73,32 @@ export default {
       item.onclick = async function () {
         await doLogout().catch(() => {});
         removeToken();
-        removeUserId();
         that.$router.replace({ name: "Login" });
       };
+    },
+    showProfile() {
+      let that = this;
+      let item = document.getElementById("manage-account-item");
+      item.onclick = () => {
+        let profile = that.$router.resolve({ name: "Account" });
+        window.open(profile.href, "_blank");
+      };
+    },
+    toIndex() {
+      this.$router.push({ name: "Index" });
     },
   },
   mounted() {
     this.logout();
+    this.showProfile();
   },
   computed: {
     isShow() {
       return this.$route.name != "Login";
+    },
+    user() {
+      let user = this.$store.state.user;
+      return user;
     },
   },
 };
@@ -89,6 +117,12 @@ export default {
   align-items: center;
 }
 
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
 #header-logo-title-container {
   display: flex;
 }
@@ -103,6 +137,7 @@ export default {
   font-size: 0.5rem;
   font-weight: 1000;
   color: #0099ff;
+  cursor: pointer;
 }
 
 #header-avatar {

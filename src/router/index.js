@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import { getToken } from '../utils/auth';
-import { routes, login } from './route';
+import { } from '../utils/auth';
+import { routes } from './route';
 
 Vue.use(VueRouter);
 
@@ -15,13 +15,6 @@ const router = new VueRouter({
 
 // 前置守卫
 router.beforeEach((to, from, next) => {
-	if (getToken() === null) {
-		if (to.path === login.path) {
-			next();
-		} else {
-			next(login.path);
-		}
-	}
 	next();
 });
 
