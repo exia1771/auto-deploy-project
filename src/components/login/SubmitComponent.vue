@@ -71,7 +71,6 @@ export default {
             callback();
           })
           .catch((error) => {
-            console.log(error.response);
             callback(new Error(error.response.data.message));
             this.existedName[value] = true;
           });

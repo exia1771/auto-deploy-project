@@ -17,19 +17,17 @@ export default {
       headerTitle: "账号",
       menuList: [
         {
-          title: "基本信息",
+          groupName: "账号信息",
           children: [
             {
               title: "个人",
               icon: "el-icon-user-solid",
-              type: "component",
               name: "Profile",
             },
             {
               title: "安全",
-              icon: "el-icon-user-solid",
-              type: "component",
-              name: "Profile",
+              icon: "el-icon-lock",
+              name: "Safety",
             },
           ],
         },

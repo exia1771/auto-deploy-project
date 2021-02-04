@@ -19,14 +19,10 @@
           <img
             v-if="user.avatarAddress"
             :src="user.avatarAddress"
-            class="avatar"
+            class="avatar box-shadow"
             id="avatar-img"
           />
-          <el-avatar
-            v-else
-            :size="avatarSize"
-            icon="el-icon-user-solid"
-          ></el-avatar>
+          <el-avatar v-else :size="50" icon="el-icon-user-solid"></el-avatar>
         </div>
         <el-dropdown-menu slot="dropdown" class="dropdown-menu">
           <el-dropdown-item id="manage-account-item">
@@ -54,13 +50,11 @@ export default {
       logo: {
         path: require("/src/assets/logo.jpg"),
         style: {},
-        avatarSize: 50,
       },
       slotStyle: {
         color: "#000033",
         margin: "0 0 0 20px",
       },
-      isShowProfile: false,
     };
   },
   methods: {

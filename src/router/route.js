@@ -37,6 +37,11 @@ export const routes = [
                 path: "profile",
                 name: "Profile",
                 component: () => import("../views/account/Profile.vue")
+            },
+            {
+                path: "safety",
+                name: "Safety",
+                component: () => import("../views/account/Safety.vue")
             }
         ]
     },

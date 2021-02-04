@@ -7,17 +7,27 @@
     >
       <el-menu-item-group v-for="(item, i) in list" :key="i">
         <template slot="title">
-          <span slot="title" v-show="!isCollapse">{{ item.title }}</span>
+          <span slot="title" :class="isCollapse === true ? 'hidden' : ''">{{
+            item.groupName
+          }}</span>
         </template>
-        <el-menu-item
+        <el-tooltip
+          class="item"
+          effect="light"
+          :content="menu.title"
+          :disabled="!isCollapse"
+          placement="right"
           v-for="(menu, j) in item.children"
           :key="j"
-          :class="getCurrentIndex(i, j) === currentIndex ? 'active' : ''"
-          @click="to(menu.name, i, j)"
         >
-          <i :class="menu.icon"></i>
-          <span slot="title" v-show="!isCollapse">{{ menu.title }}</span>
-        </el-menu-item>
+          <el-menu-item
+            :class="getCurrentIndex(i, j) === currentIndex ? 'active' : ''"
+            @click="to(menu.name, i, j)"
+          >
+            <i :class="menu.icon"></i>
+            <span slot="title" v-show="!isCollapse">{{ menu.title }}</span>
+          </el-menu-item>
+        </el-tooltip>
       </el-menu-item-group>
     </el-menu>
   </div>
@@ -45,7 +55,7 @@ export default {
     menuWidthStyle: {
       type: Object,
       default: function () {
-        return { base: 1, unit: "rem" };
+        return { base: 1.6, unit: "rem" };
       },
     },
     list: {
@@ -56,19 +66,37 @@ export default {
     },
   },
   mounted() {
-    const sideBarMenu = document.getElementById("side-bar-menu");
-    sideBarMenu.style.width =
-      this.menuWidthStyle.base + this.menuWidthStyle.unit;
-    const liNodes = document.querySelectorAll("#side-bar-menu li");
-    liNodes.forEach((element) => {
-      element.style = "";
-    });
+    this.initSideBarMenu();
   },
   methods: {
+    initSideBarMenu() {
+      const sideBarMenu = document.getElementById("side-bar-menu");
+      sideBarMenu.style.width =
+        this.menuWidthStyle.base + this.menuWidthStyle.unit;
+      const liNodes = document.querySelectorAll("#side-bar-menu li");
+      liNodes.forEach((element) => {
+        element.style = "";
+      });
+
+      let count = 0;
+      let flag = false;
+      for (let i = 0; i < this.list.length; i++) {
+        const element = this.list[i].children;
+        for (let j = 0; j < element.length; j++) {
+          if (element[j].name === this.$route.name) {
+            this.currentIndex = count;
+            flag = true;
+            break;
+          }
+          count++;
+        }
+        if (flag) break;
+      }
+    },
     spread() {
       this.isCollapse = false;
       this.sideBarMenuStyle.width =
-        this.menuWidthStyle.base * 2 + this.menuWidthStyle.unit;
+        this.menuWidthStyle.base * 1.5 + this.menuWidthStyle.unit;
     },
     collapse() {
       this.isCollapse = true;
@@ -106,5 +134,9 @@ export default {
 
 .active {
   background: rgb(0, 162, 255, 0.2);
+}
+
+.hidden {
+  visibility: hidden;
 }
 </style>

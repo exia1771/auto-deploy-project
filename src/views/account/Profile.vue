@@ -1,58 +1,61 @@
 <template>
   <div id="profile-container">
-    <div id="profile-left-container">
-      <el-form
-        label-position="top"
-        ref="updateForm"
-        :model="updateForm"
-        :rules="updateFormRules"
-      >
-        <el-form-item label="ID">
-          <el-input :placeholder="user.id" disabled class="input"></el-input>
-        </el-form-item>
-        <el-form-item label="名称">
-          <el-input
-            :placeholder="user.username"
-            disabled
-            class="input"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="电子邮件地址" prop="email">
-          <el-input class="input" v-model.trim="updateForm.email"></el-input>
-        </el-form-item>
-        <el-form-item label="联系电话" prop="telephone">
-          <el-input
-            class="input"
-            v-model.trim="updateForm.telephone"
-          ></el-input>
-        </el-form-item>
-        <el-button type="success" @click="update" :loading="isUpdate"
-          >更新</el-button
+    <el-divider content-position="left">基本信息</el-divider>
+    <div id="profile-sub-container">
+      <div id="profile-left-container">
+        <el-form
+          label-position="top"
+          ref="updateForm"
+          :model="updateForm"
+          :rules="updateFormRules"
         >
-      </el-form>
-    </div>
-    <div id="profile-right-container">
-      <div id="profile-username">头像</div>
-      <el-upload
-        id="profile-avatar"
-        class="avatar-uploader"
-        name="avatar"
-        :action="uploadAvatar.url"
-        :before-upload="beforeUpload"
-        :headers="uploadAvatar.headers"
-        :multiple="false"
-        :show-file-list="false"
-        :with-credentials="true"
-        :on-success="uploadAvatarSuccess"
-      >
-        <img
-          v-if="user.avatarAddress"
-          :src="user.avatarAddress"
-          class="avatar"
-          id="avatar-img"
-        />
-        <i v-else class="el-icon-user-solid avatar-uploader-icon"></i>
-      </el-upload>
+          <el-form-item label="ID">
+            <el-input :placeholder="user.id" disabled class="input"></el-input>
+          </el-form-item>
+          <el-form-item label="名称">
+            <el-input
+              :placeholder="user.username"
+              disabled
+              class="input"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="电子邮件地址" prop="email">
+            <el-input class="input" v-model.trim="updateForm.email"></el-input>
+          </el-form-item>
+          <el-form-item label="联系电话" prop="telephone">
+            <el-input
+              class="input"
+              v-model.trim="updateForm.telephone"
+            ></el-input>
+          </el-form-item>
+          <el-button type="success" @click="update" :loading="isUpdate"
+            >更新</el-button
+          >
+        </el-form>
+      </div>
+      <div id="profile-right-container">
+        <div id="profile-username">头像</div>
+        <el-upload
+          id="profile-avatar"
+          class="avatar-uploader"
+          name="avatar"
+          :action="uploadAvatar.url"
+          :before-upload="beforeUpload"
+          :headers="uploadAvatar.headers"
+          :multiple="false"
+          :show-file-list="false"
+          :with-credentials="true"
+          :on-success="uploadAvatarSuccess"
+        >
+          <img
+            v-if="user.avatarAddress"
+            :src="user.avatarAddress"
+            class="avatar box-shadow"
+            id="avatar-img"
+          />
+          <i v-else class="el-icon-user-solid avatar-uploader-icon"></i>
+        </el-upload>
+      </div>
     </div>
   </div>
 </template>
@@ -109,15 +112,15 @@ export default {
       uploadAvatar: {
         url: USER_PATH + "/avatar",
         imageTypeList: "image/jpeg, image/png",
+        headers: {},
       },
     };
   },
   computed: {
     user() {
-      let user = this.$store.state.user;
-      this.initForm(user);
-      console.log(user);
-      return user;
+      let storedUser = this.$store.state.user;
+      this.initForm(storedUser);
+      return storedUser;
     },
   },
   methods: {
@@ -148,6 +151,11 @@ export default {
         doUpdateBasicInfo(this.updateForm).then((res) => {
           setUser(res.data.data);
           this.isUpdate = false;
+          this.$message({
+            showClose: true,
+            message: "更新成功",
+            type: "success",
+          });
         });
       }
     },
@@ -172,7 +180,6 @@ export default {
     },
   },
   mounted() {
-    this.initForm();
     this.labelZeroPadding();
   },
 };
@@ -180,7 +187,7 @@ export default {
 
 
 <style scoped>
-#profile-container {
+#profile-sub-container {
   display: flex;
   flex-direction: row;
   padding-left: 10px;
@@ -197,6 +204,10 @@ export default {
 #profile-username {
   margin-top: 0.3rem;
   font-size: 0.5rem;
+}
+
+.el-divider__text {
+  font-size: 0.4rem;
 }
 
 #profile-avatar {
