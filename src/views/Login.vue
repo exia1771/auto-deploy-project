@@ -55,7 +55,7 @@
 import PageHeader from "../components/common/PageHeader.vue";
 import LoginComponent from "../components/login/LoginComponent";
 import SubmitComponent from "../components/login/SubmitComponent";
-import { autoLogin } from "../service/login.js";
+import { autoLogin, INDEX_NAME } from "../service/login.js";
 
 export default {
   components: { PageHeader, LoginComponent, SubmitComponent },
@@ -84,7 +84,7 @@ export default {
     async login() {
       let result = await autoLogin();
       if (result === true) {
-        this.$router.replace({ name: "Index", params: { fromLogin: true } });
+        this.$router.replace({ name: INDEX_NAME, params: { fromLogin: true } });
       }
     },
   },

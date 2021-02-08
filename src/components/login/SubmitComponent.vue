@@ -9,7 +9,7 @@
     >
       <el-form-item prop="username">
         <el-input
-          v-model="submitForm.username"
+          v-model.trim="submitForm.username"
           placeholder="用户名"
           class="input-container"
         ></el-input>
@@ -47,7 +47,7 @@
 
 
 <script>
-import { doSubmit, doCheckSameName } from "/src/service/login";
+import { doSubmit, doCheckSameName, INDEX_NAME } from "/src/service/login";
 export default {
   name: "SubmitComponent",
   data() {
@@ -136,7 +136,7 @@ export default {
       doSubmit(this.submitForm)
         .then(() => {
           this.isSubmit = false;
-          this.$router.push({ name: "Index", params: { fromLogin: true } });
+          this.$router.push({ name: INDEX_NAME, params: { fromLogin: true } });
         })
         .catch(() => {
           this.isSubmit = false;

@@ -79,7 +79,7 @@ export default {
       };
     },
     toIndex() {
-      this.$router.push({ name: "Index" });
+      this.$router.push({ name: "Deploy" });
     },
   },
   mounted() {

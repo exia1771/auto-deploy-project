@@ -1,6 +1,7 @@
 import axios from 'axios'
 import vue from '/src/main.js'
 import { PUBLIC_USER_PATH } from "../src/service/login";
+import { login } from "../src/router/route";
 
 const CHECK_NAME_URL = PUBLIC_USER_PATH + "/check"
 

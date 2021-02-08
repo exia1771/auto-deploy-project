@@ -6,11 +6,6 @@ export const login = {
 
 export const deploy = "/deploy/";
 
-export const index = {
-    path: "index",
-    name: "Index",
-    component: () => import("../views/Index.vue")
-};
 
 export const routes = [
     {
@@ -21,10 +16,14 @@ export const routes = [
     {
         path: "/deploy",
         name: "Deploy",
-        redirect: "index",
-        component: () => import("../views/Frame.vue"),
+        redirect: "/deploy/images",
+        component: () => import("../views/Index.vue"),
         children: [
-            index
+            {
+                path: "images",
+                name: "Images",
+                component: () => import("../views/index/Images.vue")
+            }
         ]
     },
     {

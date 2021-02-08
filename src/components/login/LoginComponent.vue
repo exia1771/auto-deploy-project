@@ -9,7 +9,10 @@
       class="form-container"
     >
       <el-form-item prop="username">
-        <el-input v-model="loginForm.username" placeholder="用户名"></el-input>
+        <el-input
+          v-model.trim="loginForm.username"
+          placeholder="用户名"
+        ></el-input>
       </el-form-item>
 
       <el-form-item prop="password" id="login-password-container">
@@ -34,7 +37,7 @@
 
 
 <script>
-import { doLogin } from "../../service/login";
+import { doLogin, INDEX_NAME } from "../../service/login";
 import { setUser } from "../../utils/auth";
 
 export default {
@@ -86,7 +89,7 @@ export default {
         .then((res) => {
           this.isLogin = false;
           setUser(res.data.data);
-          that.$router.replace({ name: "Index", params: { fromLogin: true } });
+          that.$router.push({ name: INDEX_NAME, params: { fromLogin: true } });
         })
         .catch(() => {
           this.isLogin = false;

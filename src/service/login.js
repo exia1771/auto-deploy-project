@@ -2,9 +2,11 @@ import axios from '../../config/asiox.config';
 import { ROOT_SERVER_URL } from '/config/global';
 import { getToken, removeToken, setUser } from '../utils/auth';
 import vue from '/src/main.js';
+import { login } from "../router/route";
 
 export const USER_PATH = ROOT_SERVER_URL + "/user";
 export const PUBLIC_USER_PATH = USER_PATH + "/public";
+export const INDEX_NAME = "Images";
 
 export async function doLogin(data) {
     return axios.post(PUBLIC_USER_PATH + "/login", data);
@@ -27,7 +29,7 @@ export async function autoLogin() {
         setUser(res.data.data);
     }).catch(() => {
         removeToken();
-        vue.$router.replace({ name: "Login" });
+        vue.$router.replace({ name: login.name });
     });
     return isLogin;
 }
