@@ -23,6 +23,11 @@ export const routes = [
                 path: "images",
                 name: "Images",
                 component: () => import("../views/index/Images.vue")
+            },
+            {
+                path: "templates",
+                name: "Templates",
+                component: () => import("../views/index/Templates.vue")
             }
         ]
     },

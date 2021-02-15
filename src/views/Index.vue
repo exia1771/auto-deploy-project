@@ -26,6 +26,16 @@ export default {
             },
           ],
         },
+        {
+          groupName: "工程",
+          children: [
+            {
+              title: "模板",
+              icon: "el-icon-takeaway-box",
+              name: "Templates",
+            },
+          ],
+        },
       ],
     };
   },

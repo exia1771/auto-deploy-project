@@ -1,5 +1,5 @@
 <template>
-  <div id="header-container" class="box-shadow">
+  <div id="header-container" class="box-shadow max-width">
     <div id="header-logo-title-container">
       <div id="header-logo">
         <img :src="logo.path" />

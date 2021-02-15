@@ -12,3 +12,7 @@ export function doFindImage(data) {
 export function doInspect(id) {
     return axios.get(IMAGE_PATH + "/inspect/" + id);
 }
+
+export function doFindByTag(tag) {
+    return axios.get(IMAGE_PATH + "/find?tag=" + tag);
+}
