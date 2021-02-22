@@ -60,6 +60,7 @@
             id="make-template-btn"
             type="warning"
             plain
+            :disabled="!user.role.createPri"
             @click="showTemplateForm(scope.row.id)"
           >
             制作模板
@@ -252,6 +253,9 @@ export default {
     tableData() {
       const list = this.imageList;
       return list;
+    },
+    user() {
+      return this.$store.state.user;
     },
   },
   created() {

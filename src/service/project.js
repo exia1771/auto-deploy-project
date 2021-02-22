@@ -15,3 +15,7 @@ export function doSaveTemplate(data) {
 export function doPageByName(data) {
     return axios.post(TEMPLATE_PATH + "/pageByName", data);
 }
+
+export function doDeleteById(id) {
+    return axios.delete(TEMPLATE_PATH + "/delete/" + id);
+}

@@ -15,6 +15,7 @@
     "element-ui": "^2.4.5",
     "eslint-plugin-html": "^6.1.1",
     "js-cookie": "^2.2.1",
+    "moment": "^2.29.1",
     "vue": "^2.6.12",
     "vue-json-viewer": "^2.2.18",
     "vue-router": "^3.4.9",

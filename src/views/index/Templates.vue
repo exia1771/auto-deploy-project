@@ -3,7 +3,6 @@
     <el-divider content-position="left">目前已有模板</el-divider>
     <div id="template-header">
       <el-input
-        width="40%"
         placeholder="模板名称"
         prefix-icon="el-icon-search"
         v-model.trim="searchText"
@@ -36,12 +35,42 @@
       <el-table-column prop="templateTag" label="模板标签" sortable>
       </el-table-column>
       <el-table-column prop="dockerImageId" label="镜像ID"> </el-table-column>
-      <el-table-column prop="creationTime" label="创建时间" sortable>
+      <el-table-column
+        prop="creationTime"
+        label="创建时间"
+        :formatter="dateFormat"
+        sortable
+      ></el-table-column>
+      <el-table-column
+        prop="updateTime"
+        label="修改时间"
+        :formatter="dateFormat"
+        sortable
+      >
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button type="success">修改</el-button>
-          <el-button type="danger">删除</el-button>
+          <el-button
+            type="success"
+            id="update-button"
+            @click="updateTemplate(scope.row)"
+            :disabled="!user.role.updatePri"
+          >
+            修改
+          </el-button>
+          <el-popconfirm
+            title="这是一段内容确定删除吗？"
+            @confirm="deleteTemplate"
+          >
+            <el-button
+              type="danger"
+              :disabled="!user.role.deletePri"
+              @click="templateForm.id = scope.row.id"
+              slot="reference"
+            >
+              删除
+            </el-button>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -56,12 +85,57 @@
       :total="pageRequest.total"
     >
     </el-pagination>
+
+    <el-dialog
+      id="template-form"
+      title="制作模板"
+      :visible.sync="templateFormVisible"
+    >
+      <el-form
+        :model="templateForm"
+        ref="templateForm"
+        :rules="templateFormRules"
+        status-icon
+      >
+        <el-form-item label="模板名称" prop="templateName">
+          <el-input v-model.trim="templateForm.templateName" autocomplete="off">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="模板标签" prop="templateTag">
+          <el-input v-model.trim="templateForm.templateTag" autocomplete="off">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="镜像ID" prop="dockerImageId">
+          <el-input
+            v-model.trim="templateForm.dockerImageId"
+            autocomplete="off"
+          >
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="templateFormVisible = false">取 消</el-button>
+        <el-button
+          type="primary"
+          @click="saveTemplate()"
+          :loading="isFormSaving"
+        >
+          确 定
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 
 <script>
-import { doPageAll, doPageByName } from "../../service/project";
+import {
+  doPageAll,
+  doPageByName,
+  doSaveTemplate,
+  doDeleteById,
+} from "../../service/project";
+import { objEqual, dateFormatter } from "../../utils/common.js";
 export default {
   name: "Templates",
   data() {
@@ -75,6 +149,44 @@ export default {
       templateList: [],
       isLoading: false,
       isSearch: false,
+      templateFormVisible: false,
+      templateForm: {
+        id: "",
+        templateName: "",
+        templateTag: "",
+        dockerImageId: "",
+      },
+      oldTemplateForm: { templateName: "", templateTag: "", dockerImageId: "" },
+      isFormSaving: false,
+      templateFormRules: {
+        templateName: [
+          { required: true, message: "请输入模板名称", trigger: "blur" },
+          {
+            min: 1,
+            max: 255,
+            message: "长度在 1~255 个字符",
+            trigger: ["blur", "change"],
+          },
+        ],
+        dockerImageId: [
+          { required: true, message: "请输入模板名称", trigger: "blur" },
+          {
+            min: 1,
+            max: 255,
+            message: "长度在 1~255 个字符",
+            trigger: ["blur", "change"],
+          },
+        ],
+        templateTag: [
+          { required: true, message: "请输入模板标签", trigger: "blur" },
+          {
+            min: 1,
+            max: 255,
+            message: "长度在 1~255 个字符",
+            trigger: ["blur", "change"],
+          },
+        ],
+      },
     };
   },
   methods: {
@@ -106,6 +218,9 @@ export default {
         this.pageAll();
       }
     },
+    dateFormat(row, column, cellValue) {
+      return dateFormatter(cellValue);
+    },
     search() {
       if (!this.isSearch) {
         this.pageRequest.current = 1;
@@ -130,6 +245,57 @@ export default {
       this.pageRequest.current = 1;
       this.pageAll();
     },
+    updateTemplate(template) {
+      this.templateForm.templateName = template.templateName;
+      this.templateForm.id = template.id;
+      this.templateForm.templateTag = template.templateTag;
+      this.templateForm.dockerImageId = template.dockerImageId;
+      this.oldTemplateForm = { ...this.templateForm };
+      this.templateFormVisible = true;
+    },
+    deleteTemplate() {
+      doDeleteById(this.templateForm.id).then((res) => {
+        if (res.data.data === true) {
+          this.$message.success("删除成功");
+        } else {
+          this.$message.error("删除失败");
+        }
+        this.pageAll();
+      });
+    },
+    saveTemplate() {
+      if (objEqual(this.templateForm, this.oldTemplateForm)) {
+        this.$message.success("保存成功");
+        return;
+      }
+
+      let validResult = true;
+
+      this.$refs.templateForm.validate((valid) => {
+        if (!valid) {
+          validResult = false;
+          return false;
+        }
+      });
+
+      if (!validResult) {
+        return;
+      }
+
+      this.isFormSaving = true;
+      doSaveTemplate({
+        ...this.templateForm,
+      })
+        .then(() => {
+          this.isFormSaving = false;
+          this.templateFormVisible = false;
+          this.$message.success("保存完成");
+          this.pageAll();
+        })
+        .catch(() => {
+          this.isFormSaving = false;
+        });
+    },
   },
   created() {
     this.pageAll();
@@ -138,6 +304,9 @@ export default {
     tableData() {
       const list = this.templateList;
       return list;
+    },
+    user() {
+      return this.$store.state.user;
     },
   },
 };
@@ -158,11 +327,15 @@ export default {
   margin-bottom: 10px;
 }
 
-.el-input {
+#template-header .el-input {
   width: 30%;
 }
 
 #search-btn {
   margin-left: 10px;
+}
+
+#update-button {
+  margin-right: 10px;
 }
 </style>

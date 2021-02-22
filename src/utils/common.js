@@ -1,3 +1,6 @@
+import moment from 'moment';
+
+
 export function nullToBlank(o) {
     if (o === null || o === undefined || o === "") {
         return "";
@@ -20,4 +23,29 @@ export function getOrDefault(o, value) {
     } else {
         return o;
     }
+}
+
+export function objEqual(a, b) {
+    let aKeys = Object.keys(a);
+    let bKeys = Object.keys(b);
+
+    if (aKeys !== bKeys) {
+        return false;
+    }
+
+    for (let i = 0; i < aKeys.length; i++) {
+        const aEl = a[i];
+        const bEl = b[i];
+
+        if (aEl !== bEl) {
+            return false;
+        }
+
+    }
+
+    return true;
+}
+
+export function dateFormatter(date) {
+    return moment(date).add(8, 'hours').format("YYYY-MM-DD hh:mm:ss");
 }
