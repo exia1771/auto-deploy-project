@@ -1,9 +1,9 @@
 <template>
   <div>
-    <el-divider content-position="left" class="title">目前已有镜像</el-divider>
+    <el-divider content-position="left">镜像</el-divider>
     <div id="search-container">
       <el-input
-        placeholder="输入Tag名"
+        placeholder="输入仓库标签名"
         prefix-icon="el-icon-search"
         v-model.trim="searchText"
       >
@@ -50,7 +50,7 @@
             type="success"
             plain
             @click="copyID()"
-            :data-clipboard-text="scope.row.id.substring(7)"
+            :data-clipboard-text="scope.row.id"
             id="copy-btn"
           >
             复制ID

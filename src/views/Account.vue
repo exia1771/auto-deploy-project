@@ -34,6 +34,9 @@ export default {
       ],
     };
   },
+  created() {
+    document.title = "账号管理";
+  },
 };
 </script>
 

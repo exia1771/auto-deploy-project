@@ -28,6 +28,11 @@ export const routes = [
                 path: "templates",
                 name: "Templates",
                 component: () => import("../views/index/Templates.vue")
+            },
+            {
+                path: "projects",
+                name: "Projects",
+                component: () => import("../views/index/Projects.vue")
             }
         ]
     },

@@ -1,6 +1,6 @@
 <template>
   <div id="template-container">
-    <el-divider content-position="left">目前已有模板</el-divider>
+    <el-divider content-position="left">模板</el-divider>
     <div id="template-header">
       <el-input
         placeholder="模板名称"
@@ -16,13 +16,7 @@
         复原
       </el-button>
     </div>
-    <el-table
-      :data="tableData"
-      stripe
-      border
-      style="width: 95%"
-      :loading="isLoading"
-    >
+    <el-table :data="tableData" stripe border :loading="isLoading">
       <el-table-column prop="id" label="ID" width="180" sortable>
       </el-table-column>
       <el-table-column
@@ -32,20 +26,23 @@
         sortable
       >
       </el-table-column>
-      <el-table-column prop="templateTag" label="模板标签" sortable>
+      <el-table-column prop="templateTag" label="模板标签" sortable width="180">
       </el-table-column>
-      <el-table-column prop="dockerImageId" label="镜像ID"> </el-table-column>
+      <el-table-column prop="dockerImageId" label="镜像ID" width="180">
+      </el-table-column>
       <el-table-column
         prop="creationTime"
         label="创建时间"
         :formatter="dateFormat"
         sortable
+        width="180"
       ></el-table-column>
       <el-table-column
         prop="updateTime"
         label="修改时间"
         :formatter="dateFormat"
         sortable
+        width="180"
       >
       </el-table-column>
       <el-table-column label="操作">

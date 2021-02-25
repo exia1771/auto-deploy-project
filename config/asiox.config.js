@@ -28,7 +28,7 @@ axios.interceptors.response.use((res) => {
         type: "error",
     });
 
-    if (error.response.data.status == UNAUTHORIZED) {
+    if (error.response.status === UNAUTHORIZED) {
         vue.$router.push({ path: login.path });
         return;
     }

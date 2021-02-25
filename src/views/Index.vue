@@ -27,17 +27,25 @@ export default {
           ],
         },
         {
-          groupName: "工程",
+          groupName: "项目",
           children: [
             {
               title: "模板",
               icon: "el-icon-takeaway-box",
               name: "Templates",
             },
+            {
+              title: "工程",
+              icon: "el-icon-suitcase-1",
+              name: "Projects",
+            },
           ],
         },
       ],
     };
+  },
+  created() {
+    document.title = "个人综合管理";
   },
 };
 </script>

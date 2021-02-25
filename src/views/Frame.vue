@@ -84,6 +84,7 @@ export default {
 #right-frame {
   margin-left: calc(var(--base) / 6);
   flex: 1;
+  overflow: hidden;
 }
 
 #right-frame-content {
