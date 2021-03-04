@@ -32,9 +32,17 @@ export function doFindTagsByTemplateName(templateName) {
     return axios.get(TEMPLATE_PATH + "/tag/" + templateName);
 }
 
+export function doFindTemplateIdByTemplateNameAndTag(templateName, tag) {
+    return axios.get(TEMPLATE_PATH + "/id?" + "templateName=" + templateName + "&templateTag=" + tag);
+}
+
 
 export const PROJECT_PATH = ROOT_SERVER_URL + "/project";
 
 export function doSaveProject(data) {
     return axios.post(PROJECT_PATH + "/save", data);
+}
+
+export function doFindListByCurrentUser() {
+    return axios.get(PROJECT_PATH + "/list");
 }

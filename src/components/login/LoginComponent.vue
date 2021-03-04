@@ -37,7 +37,7 @@
 
 
 <script>
-import { doLogin, INDEX_NAME } from "../../service/login";
+import { doLogin, INDEX_NAME, PREVIOUS_ROUTE } from "../../service/login";
 import { setUser } from "../../utils/auth";
 
 export default {
@@ -89,7 +89,17 @@ export default {
         .then((res) => {
           this.isLogin = false;
           setUser(res.data.data);
-          that.$router.push({ name: INDEX_NAME, params: { fromLogin: true } });
+          if (PREVIOUS_ROUTE !== "" && PREVIOUS_ROUTE !== "Login") {
+            this.$router.push({
+              name: PREVIOUS_ROUTE,
+              params: { fromLogin: true },
+            });
+          } else {
+            that.$router.push({
+              name: INDEX_NAME,
+              params: { fromLogin: true },
+            });
+          }
         })
         .catch(() => {
           this.isLogin = false;

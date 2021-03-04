@@ -26,21 +26,33 @@
       <div id="project-header-right"></div>
     </div>
     <div id="projct-table-container">
-      <el-table :data="tableData" stripe border>
-        <el-table-column prop="date" label="ID" width="180"> </el-table-column>
-        <el-table-column prop="name" label="工程名称" width="180">
+      <el-table :data="tableData" stripe v-loading="tableLoading">
+        <el-table-column prop="name" label="工程名称" width="280">
         </el-table-column>
-        <el-table-column prop="address" label="工程标识" width="180">
+        <el-table-column prop="identification" label="工程标识" width="280">
         </el-table-column>
-        <el-table-column prop="address" label="拥有者"> </el-table-column>
-        <el-table-column prop="address" label="编辑"> </el-table-column>
+        <el-table-column prop="username" label="拥有者"> </el-table-column>
+        <el-table-column label="操作">
+          <el-button plain type="danger">删除</el-button>
+        </el-table-column>
       </el-table>
     </div>
+    <el-pagination
+      id="pagination"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="pageRequest.current"
+      :page-sizes="[1, 5, 10, 20, 50, 100]"
+      :page-size="pageRequest.size"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="pageRequest.total"
+    >
+    </el-pagination>
 
     <el-dialog
-      title="新建工程"
       :visible.sync="projectForm.visible"
       :close-on-click-modal="false"
+      width="40%"
     >
       <el-form
         :model="projectForm.form"
@@ -132,7 +144,7 @@
         <el-button @click="projectForm.visible = false">取 消</el-button>
         <el-button
           type="primary"
-          @click="projectForm.visible = false"
+          @click="saveProject"
           :loading="projectForm.loading"
         >
           确 定
@@ -148,6 +160,8 @@ import {
   doSaveProject,
   doFindDistinctTemplateName,
   doFindTagsByTemplateName,
+  doFindTemplateIdByTemplateNameAndTag,
+  doFindListByCurrentUser,
 } from "../../service/project";
 export default {
   name: "Projects",
@@ -178,13 +192,14 @@ export default {
     };
     return {
       searchText: "",
-      tableData: [
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-      ],
+      tableData: [],
+      tableLoading: false,
+      isSearch: false,
+      pageRequest: {
+        current: 1,
+        size: 5,
+        total: 0,
+      },
       templateNameOptions: {
         loading: false,
         data: [],
@@ -202,6 +217,8 @@ export default {
           description: "",
           templateName: "",
           templateTag: "",
+          templateId: "",
+          state: 0,
         },
         rules: {
           name: [
@@ -293,10 +310,25 @@ export default {
   },
   created() {
     this.findDistinctTemplateName();
+    this.findListByCurrentUser();
   },
   methods: {
-    saveProject() {
+    pageAll() {},
+    handleSizeChange() {},
+    handleCurrentChange() {},
+    async saveProject() {
+      let validResult = true;
+      this.$refs.projectForm.validate((valid) => {
+        if (!valid) {
+          validResult = false;
+          return false;
+        }
+      });
+      if (!validResult) {
+        return;
+      }
       this.projectForm.loading = true;
+      await this.findTemplateIdByTemplateNameAndTag();
       doSaveProject({
         ...this.projectForm.form,
       })
@@ -331,6 +363,25 @@ export default {
           this.templateTagOptions.loading = false;
         });
     },
+    async findTemplateIdByTemplateNameAndTag() {
+      await doFindTemplateIdByTemplateNameAndTag(
+        this.projectForm.form.templateName,
+        this.projectForm.form.templateTag
+      ).then((res) => {
+        this.projectForm.form.templateId = res.data.data.id;
+      });
+    },
+    findListByCurrentUser() {
+      this.tableLoading = true;
+      doFindListByCurrentUser()
+        .then((res) => {
+          this.tableData = res.data.data;
+          this.tableLoading = false;
+        })
+        .catch(() => {
+          this.tableLoading = false;
+        });
+    },
   },
 };
 </script>
@@ -340,6 +391,10 @@ export default {
 .el-divider__text {
   font-weight: 800;
   font-size: 0.4rem;
+}
+
+.el-form-item {
+  margin: 10px;
 }
 
 #project-header {

@@ -7,6 +7,7 @@ import { login } from "../router/route";
 export const USER_PATH = ROOT_SERVER_URL + "/user";
 export const PUBLIC_USER_PATH = USER_PATH + "/public";
 export const INDEX_NAME = "Images";
+export let PREVIOUS_ROUTE = "";
 
 export async function doLogin(data) {
     return axios.post(PUBLIC_USER_PATH + "/login", data);
@@ -20,6 +21,7 @@ export async function autoLogin() {
     let isLogin = false;
     if (getToken() === null) {
         if (vue.$route.name !== "Login") {
+            PREVIOUS_ROUTE = vue.$route.name;
             vue.$router.replace({ name: "Login" });
         }
         return isLogin;
@@ -28,6 +30,7 @@ export async function autoLogin() {
         isLogin = true;
         setUser(res.data.data);
     }).catch(() => {
+        PREVIOUS_ROUTE = vue.$route.name;
         removeToken();
         vue.$router.replace({ name: login.name });
     });
