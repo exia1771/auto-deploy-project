@@ -33,7 +33,7 @@
         </el-table-column>
         <el-table-column prop="username" label="拥有者"> </el-table-column>
         <el-table-column label="操作">
-          <el-button plain type="danger">删除</el-button>
+          <icon-button :operations="operations"></icon-button>
         </el-table-column>
       </el-table>
     </div>
@@ -50,9 +50,10 @@
     </el-pagination>
 
     <el-dialog
+      id="project-dialog"
       :visible.sync="projectForm.visible"
       :close-on-click-modal="false"
-      width="40%"
+      width="35%"
     >
       <el-form
         :model="projectForm.form"
@@ -92,12 +93,14 @@
               filterable
               placeholder="请选择"
               :loading="templateTagOptions.loading"
+              no-data-text="请先选择模板"
+              @change="changeProjectTemplateId"
             >
               <el-option
                 v-for="(item, index) in templateTagOptions.data"
                 :key="index"
-                :label="item"
-                :value="item"
+                :label="item.templateTag"
+                :value="item.id"
               >
               </el-option>
             </el-select>
@@ -160,11 +163,14 @@ import {
   doSaveProject,
   doFindDistinctTemplateName,
   doFindTagsByTemplateName,
-  doFindTemplateIdByTemplateNameAndTag,
-  doFindListByCurrentUser,
+  doFindProjectsByCurrentUser,
 } from "../../service/project";
+import IconButton from "../../components/common/IconButton";
 export default {
   name: "Projects",
+  components: {
+    IconButton,
+  },
   data() {
     const checkIdentification = (rule, value, callback) => {
       if (value !== null) {
@@ -172,7 +178,7 @@ export default {
           const pattern = /^[\w-]+$/;
           if (value.search(pattern) === -1) {
             callback(
-              new Error("标识符只允许输入 数字、字母、英文减号、下划线")
+              new Error("工程标识只允许输入 数字、字母、英文减号、下划线")
             );
           }
         }
@@ -200,6 +206,16 @@ export default {
         size: 5,
         total: 0,
       },
+      operations: [
+        {
+          content: "删除",
+          placement: "top-end",
+          buttonType: "danger",
+          icon: "el-icon-delete",
+          method: console.log,
+          args: 5,
+        },
+      ],
       templateNameOptions: {
         loading: false,
         data: [],
@@ -310,7 +326,7 @@ export default {
   },
   created() {
     this.findDistinctTemplateName();
-    this.findListByCurrentUser();
+    this.findProjectsByCurrentUser();
   },
   methods: {
     pageAll() {},
@@ -328,7 +344,6 @@ export default {
         return;
       }
       this.projectForm.loading = true;
-      await this.findTemplateIdByTemplateNameAndTag();
       doSaveProject({
         ...this.projectForm.form,
       })
@@ -357,23 +372,15 @@ export default {
         .then((res) => {
           this.templateTagOptions.loading = false;
           this.templateTagOptions.data = res.data.data;
-          this.projectForm.form.templateTag = res.data.data[0];
+          this.projectForm.form.templateTag = res.data.data[0].templateTag;
         })
         .catch(() => {
           this.templateTagOptions.loading = false;
         });
     },
-    async findTemplateIdByTemplateNameAndTag() {
-      await doFindTemplateIdByTemplateNameAndTag(
-        this.projectForm.form.templateName,
-        this.projectForm.form.templateTag
-      ).then((res) => {
-        this.projectForm.form.templateId = res.data.data.id;
-      });
-    },
-    findListByCurrentUser() {
+    findProjectsByCurrentUser() {
       this.tableLoading = true;
-      doFindListByCurrentUser()
+      doFindProjectsByCurrentUser()
         .then((res) => {
           this.tableData = res.data.data;
           this.tableLoading = false;
@@ -382,10 +389,27 @@ export default {
           this.tableLoading = false;
         });
     },
+    changeProjectTemplateId(id) {
+      this.projectForm.form.templateId = id;
+    },
   },
 };
 </script>
 
+
+<style>
+#project-dialog .el-dialog__header {
+  padding: 0px;
+}
+
+#project-dialog .el-dialog__body {
+  padding: 20px 10px 0 10px;
+}
+
+#project-dialog .el-dialog__footer {
+  padding: 0 10px 10px 10px;
+}
+</style>
 
 <style scoped>
 .el-divider__text {
@@ -393,8 +417,12 @@ export default {
   font-size: 0.4rem;
 }
 
+.el-dialog__wrapper {
+  top: auto;
+}
+
 .el-form-item {
-  margin: 10px;
+  margin: 5px;
 }
 
 #project-header {

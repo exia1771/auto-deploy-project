@@ -43,6 +43,6 @@ export function doSaveProject(data) {
     return axios.post(PROJECT_PATH + "/save", data);
 }
 
-export function doFindListByCurrentUser() {
+export function doFindProjectsByCurrentUser() {
     return axios.get(PROJECT_PATH + "/list");
 }
