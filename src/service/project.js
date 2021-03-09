@@ -36,7 +36,6 @@ export function doFindTemplateIdByTemplateNameAndTag(templateName, tag) {
     return axios.get(TEMPLATE_PATH + "/id?" + "templateName=" + templateName + "&templateTag=" + tag);
 }
 
-
 export const PROJECT_PATH = ROOT_SERVER_URL + "/project";
 
 export function doSaveProject(data) {
@@ -45,4 +44,16 @@ export function doSaveProject(data) {
 
 export function doFindProjectsByCurrentUser() {
     return axios.get(PROJECT_PATH + "/list");
+}
+
+export function doFindPagedProjectsByCurrentUser(pageable) {
+    return axios.post(PROJECT_PATH + "/list", pageable);
+}
+
+export function doFindPagedProjectsByKeyword(keyword, pageable) {
+    return axios.post(PROJECT_PATH + "/search/" + keyword, pageable);
+}
+
+export function doDeleteProjectById(id) {
+    return axios.delete(PROJECT_PATH + "/" + id);
 }

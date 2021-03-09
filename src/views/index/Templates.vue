@@ -8,12 +8,21 @@
         v-model.trim="searchText"
       >
       </el-input>
-      <el-button id="search-btn" type="primary" plain @click="search">
+      <el-button id="search-btn" type="success" plain @click="search">
         搜索
       </el-button>
 
-      <el-button id="reset-btn" type="success" plain @click="reset">
+      <el-button id="reset-btn" type="info" plain @click="reset">
         复原
+      </el-button>
+
+      <el-button
+        id="create-btn"
+        type="primary"
+        plain
+        @click="templateFormVisible = true"
+      >
+        新增
       </el-button>
     </div>
     <el-table :data="tableData" stripe border :loading="isLoading">
@@ -310,10 +319,10 @@ export default {
 </script>
 
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../utils/globla.scss";
 .el-divider__text {
-  font-weight: 800;
-  font-size: 0.4rem;
+  @extend .divider-text;
 }
 
 #pagination {

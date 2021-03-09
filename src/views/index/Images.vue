@@ -265,10 +265,10 @@ export default {
 </script>
 
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../utils/globla.scss";
 .el-divider__text {
-  font-weight: 800;
-  font-size: 0.4rem;
+  @extend .divider-text;
 }
 
 .jv-container {

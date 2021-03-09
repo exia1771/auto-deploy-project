@@ -4,14 +4,34 @@
     <div id="project-header">
       <div id="project-header-left">
         <el-input
-          placeholder="工程名称"
+          placeholder="工程名称、工程标识、拥有者"
           prefix-icon="el-icon-search"
           v-model.trim="searchText"
         >
         </el-input>
-        <el-button id="search-btn" type="success" plain> 搜索 </el-button>
+        <el-button
+          id="search-btn"
+          type="success"
+          plain
+          @click="
+            isSearch = true;
+            findPagedProjectsByKeyword();
+          "
+        >
+          搜索
+        </el-button>
 
-        <el-button id="reset-btn" type="info" plain> 复原 </el-button>
+        <el-button
+          id="reset-btn"
+          type="info"
+          plain
+          @click="
+            isSearch = false;
+            findProjectsByCurrentUser();
+          "
+        >
+          复原
+        </el-button>
 
         <el-button
           id="create-btn"
@@ -26,24 +46,74 @@
       <div id="project-header-right"></div>
     </div>
     <div id="projct-table-container">
-      <el-table :data="tableData" stripe v-loading="tableLoading">
+      <el-table :data="tableData" stripe v-loading="tableLoading" border>
         <el-table-column prop="name" label="工程名称" width="280">
         </el-table-column>
         <el-table-column prop="identification" label="工程标识" width="280">
         </el-table-column>
         <el-table-column prop="username" label="拥有者"> </el-table-column>
         <el-table-column label="操作">
-          <icon-button :operations="operations"></icon-button>
+          <template slot-scope="scope">
+            <el-tooltip
+              effect="light"
+              content="查看"
+              placement="top"
+              class="button-group"
+            >
+              <el-button
+                @click="toDetail(scope.row)"
+                plain
+                circle
+                type="primary"
+                icon="el-icon-view"
+              ></el-button>
+            </el-tooltip>
+
+            <el-tooltip
+              effect="light"
+              content="配置"
+              placement="top"
+              class="button-group"
+            >
+              <el-button
+                @click="toSetting(scope.row)"
+                plain
+                circle
+                type="info"
+                icon="el-icon-setting"
+              ></el-button>
+            </el-tooltip>
+
+            <el-popconfirm
+              title="确定删除吗？"
+              @confirm="deleteProjectById(scope)"
+              class="button-group"
+            >
+              <el-tooltip
+                effect="light"
+                content="删除"
+                placement="top"
+                slot="reference"
+              >
+                <el-button
+                  plain
+                  circle
+                  type="danger"
+                  icon="el-icon-delete"
+                ></el-button>
+              </el-tooltip>
+            </el-popconfirm>
+          </template>
         </el-table-column>
       </el-table>
     </div>
+
     <el-pagination
-      id="pagination"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="pageRequest.current"
-      :page-sizes="[1, 5, 10, 20, 50, 100]"
+      :page-sizes="[1, 5, 10, 20, 50, 100, 500]"
       :page-size="pageRequest.size"
+      :current-page="pageRequest.current"
       layout="total, sizes, prev, pager, next, jumper"
       :total="pageRequest.total"
     >
@@ -164,13 +234,12 @@ import {
   doFindDistinctTemplateName,
   doFindTagsByTemplateName,
   doFindProjectsByCurrentUser,
+  doFindPagedProjectsByCurrentUser,
+  doFindPagedProjectsByKeyword,
+  doDeleteProjectById,
 } from "../../service/project";
-import IconButton from "../../components/common/IconButton";
 export default {
   name: "Projects",
-  components: {
-    IconButton,
-  },
   data() {
     const checkIdentification = (rule, value, callback) => {
       if (value !== null) {
@@ -203,19 +272,9 @@ export default {
       isSearch: false,
       pageRequest: {
         current: 1,
-        size: 5,
+        size: 10,
         total: 0,
       },
-      operations: [
-        {
-          content: "删除",
-          placement: "top-end",
-          buttonType: "danger",
-          icon: "el-icon-delete",
-          method: console.log,
-          args: 5,
-        },
-      ],
       templateNameOptions: {
         loading: false,
         data: [],
@@ -329,9 +388,14 @@ export default {
     this.findProjectsByCurrentUser();
   },
   methods: {
-    pageAll() {},
-    handleSizeChange() {},
-    handleCurrentChange() {},
+    handleSizeChange(size) {
+      this.pageRequest.size = size;
+      this.pageAll();
+    },
+    handleCurrentChange(current) {
+      this.pageRequest.current = current;
+      this.pageAll();
+    },
     async saveProject() {
       let validResult = true;
       this.$refs.projectForm.validate((valid) => {
@@ -349,6 +413,9 @@ export default {
       })
         .then(() => {
           this.projectForm.loading = false;
+          this.projectForm.visible = false;
+          this.$message.success("保存成功");
+          this.findProjectsByCurrentUser();
         })
         .catch(() => {
           this.projectForm.loading = false;
@@ -373,6 +440,7 @@ export default {
           this.templateTagOptions.loading = false;
           this.templateTagOptions.data = res.data.data;
           this.projectForm.form.templateTag = res.data.data[0].templateTag;
+          this.projectForm.form.templateId = res.data.data[0].id;
         })
         .catch(() => {
           this.templateTagOptions.loading = false;
@@ -382,15 +450,71 @@ export default {
       this.tableLoading = true;
       doFindProjectsByCurrentUser()
         .then((res) => {
-          this.tableData = res.data.data;
+          this.tableData = res.data.data.records;
           this.tableLoading = false;
+          this.pageRequest.total = res.data.data.total;
         })
         .catch(() => {
           this.tableLoading = false;
+          this.pageRequest.total = 0;
         });
     },
-    changeProjectTemplateId(id) {
-      this.projectForm.form.templateId = id;
+    changeProjectTemplateId(value) {
+      this.projectForm.form.templateId = value;
+    },
+    findPagedProjectsByCurrentUser() {
+      doFindPagedProjectsByCurrentUser(this.pageRequest)
+        .then((res) => {
+          this.tableData = res.data.data.records;
+          this.pageRequest.total = res.data.data.total;
+          this.pageRequest.current = res.data.data.current;
+          this.pageRequest.size = res.data.data.size;
+        })
+        .catch(() => {
+          this.tableData = [];
+        });
+    },
+    findPagedProjectsByKeyword() {
+      doFindPagedProjectsByKeyword(this.searchText, this.pageRequest)
+        .then((res) => {
+          this.tableData = res.data.data.records;
+          this.pageRequest.total = res.data.data.total;
+          this.pageRequest.current = res.data.data.current;
+          this.pageRequest.size = res.data.data.size;
+        })
+        .catch(() => {
+          this.tableData = [];
+        });
+    },
+    pageAll() {
+      if (!this.isSearch) {
+        this.findPagedProjectsByCurrentUser();
+      } else {
+        this.findPagedProjectsByKeyword();
+      }
+    },
+    deleteProjectById(scope) {
+      this.tableData.splice(scope.$index, 1);
+      doDeleteProjectById(scope.row.id)
+        .then(() => {
+          this.pageAll();
+          this.$message.success("删除成功");
+        })
+        .catch(() => {
+          this.pageAll();
+        });
+    },
+    toDetail(project) {
+      this.$router.push({
+        name: "ProjectsDetail",
+        params: { id: project.id, name: project.name },
+      });
+    },
+    toSetting(project) {
+      this.$router.push({
+        name: "ProjectsSetting",
+        params: { id: project.id, name: project.name },
+      });
     },
   },
 };
@@ -411,10 +535,10 @@ export default {
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../utils/globla.scss";
 .el-divider__text {
-  font-weight: 800;
-  font-size: 0.4rem;
+  @extend .divider-text;
 }
 
 .el-dialog__wrapper {
@@ -444,9 +568,14 @@ export default {
 
 #form-select-container {
   display: flex;
+  margin-top: 8px;
 }
 
 .select-item {
   flex: 1;
+}
+
+.button-group {
+  margin: 0 5px;
 }
 </style>

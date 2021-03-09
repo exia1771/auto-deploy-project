@@ -32,7 +32,17 @@ export const routes = [
             {
                 path: "projects",
                 name: "Projects",
-                component: () => import("../views/index/Projects.vue")
+                component: () => import("../views/index/Projects.vue"),
+            },
+            {
+                path: "project/detail/:id",
+                name: "ProjectsDetail",
+                component: () => import("../views/project/ProjectDetail.vue")
+            },
+            {
+                path: "project/setting/:id",
+                name: "ProjectsSetting",
+                component: () => import("../views/project/ProjectSetting.vue")
             }
         ]
     },

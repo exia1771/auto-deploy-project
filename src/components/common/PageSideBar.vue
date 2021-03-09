@@ -83,7 +83,7 @@ export default {
       for (let i = 0; i < this.list.length; i++) {
         const element = this.list[i].children;
         for (let j = 0; j < element.length; j++) {
-          if (element[j].name === this.$route.name) {
+          if (this.$route.name.startsWith(element[j].name)) {
             this.currentIndex = count;
             flag = true;
             break;
@@ -112,7 +112,7 @@ export default {
     getCurrentIndex(i, j) {
       let result = 0;
       for (let index = 0; index < i; index++) {
-        result += this.list[index].length;
+        result += this.list[index].children.length;
       }
       return result + j;
     },
