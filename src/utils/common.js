@@ -29,13 +29,13 @@ export function objEqual(a, b) {
     let aKeys = Object.keys(a);
     let bKeys = Object.keys(b);
 
-    if (aKeys !== bKeys) {
+    if (aKeys.length !== bKeys.length) {
         return false;
     }
 
     for (let i = 0; i < aKeys.length; i++) {
-        const aEl = a[i];
-        const bEl = b[i];
+        const aEl = a[aKeys[i]];
+        const bEl = b[bKeys[i]];
 
         if (aEl !== bEl) {
             return false;
