@@ -65,3 +65,7 @@ export function doDeleteProjectById(id) {
 export function doFindProjectById(id) {
     return axios.get(PROJECT_PATH + "/" + id);
 }
+
+export function doUpdateProjectById(id, project) {
+    return axios.put(PROJECT_PATH + `/${id}`, project);
+}

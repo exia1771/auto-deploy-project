@@ -2,3 +2,11 @@
     font-weight: 800;
     font-size: 0.45rem;
 }
+
+$percent-width: 50%;
+
+.to-left {
+    display: flex;
+    justify-content: flex-end;
+    width: $percent-width;
+}
