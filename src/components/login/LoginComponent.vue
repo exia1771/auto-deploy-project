@@ -89,7 +89,11 @@ export default {
         .then((res) => {
           this.isLogin = false;
           setUser(res.data.data);
-          if (PREVIOUS_ROUTE.name !== "" && PREVIOUS_ROUTE.name !== "Login") {
+          if (
+            PREVIOUS_ROUTE.name !== undefined &&
+            PREVIOUS_ROUTE.name !== "" &&
+            PREVIOUS_ROUTE.name !== "Login"
+          ) {
             this.$router.push({
               name: PREVIOUS_ROUTE.name,
               params: { fromLogin: true, ...PREVIOUS_ROUTE.params },
