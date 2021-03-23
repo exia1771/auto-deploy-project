@@ -55,21 +55,38 @@
               :precision="0"
               :max="65535"
             ></el-input-number>
-            <div class="port-icon" @click="addPortMapping(index)">
-              <i class="el-icon-circle-plus-outline"></i>
+            <div class="flex icon-container">
+              <div class="port-icon" @click="addPortMapping(index)">
+                <i class="el-icon-circle-plus-outline"></i>
+              </div>
+              <div
+                class="port-icon"
+                @click="removePortMapping(index)"
+                v-show="configInfoForm.port.length >= 2"
+              >
+                <i class="el-icon-remove-outline"></i>
+              </div>
             </div>
           </div>
         </el-form-item>
       </el-form>
     </div>
     <div class="content-to-left">
-      <el-button type="success">更新</el-button>
+      <el-button
+        type="success"
+        :disabled="isUpdatedConfigInfoForm"
+        @click="updateConfigInfoForm"
+        >更新</el-button
+      >
     </div>
   </div>
 </template>
 
 
 <script>
+import { doFindProjectConfigById } from "../../service/projectConfig";
+import { doFindProjectById } from "../../service/project";
+import { objEqual } from "../../utils/common";
 export default {
   name: "ProjectConfig",
   data() {
@@ -93,8 +110,11 @@ export default {
         ],
       },
       configInfoFormLoading: false,
-      isUpdatedConfigInfoForm: false,
+      project: {},
     };
+  },
+  created() {
+    this.findProjectConfigById();
   },
   methods: {
     addPortMapping(index) {
@@ -110,6 +130,56 @@ export default {
         this.configInfoForm.port = portArray;
       }
     },
+    removePortMapping(index) {
+      this.configInfoForm.port.splice(index, 1);
+    },
+    async findProjectConfigById() {
+      let configId = this.routeParams.configId;
+      if (configId === undefined && this.project.configId === undefined) {
+        await doFindProjectById(this.routeParams.id)
+          .then((res) => {
+            this.project = res.data.data;
+            configId = this.project.configId;
+          })
+          .catch(() => {
+            configId = null;
+          });
+      }
+
+      if (configId === null) {
+        return;
+      }
+
+      doFindProjectConfigById(configId).then((res) => {
+        const data = res.data.data;
+        this.configInfoForm.memory = data.memory;
+        this.configInfoForm.storage = data.storage;
+        this.configInfoForm.cpu = data.core;
+        this.originConfigInfoForm = { ...this.configInfoForm };
+        if (data.port != null || data.port != undefined) {
+          this.configInfoForm.port = JSON.parse(data.port);
+        }
+        this.originConfigInfoForm = JSON.parse(
+          JSON.stringify(this.configInfoForm)
+        );
+      });
+    },
+    updateConfigInfoForm() {
+      // if (this.isUpdatedConfigInfoForm) {
+      //   const configInfo = { ...this.configInfoForm };
+      //   console.log(configInfo);
+      // }
+    },
+  },
+  computed: {
+    routeParams() {
+      return this.$route.params;
+    },
+    isUpdatedConfigInfoForm() {
+      console.log(JSON.stringify(this.configInfoForm));
+      console.log(JSON.stringify(this.originConfigInfoForm));
+      return objEqual(this.configInfoForm, this.originConfigInfoForm);
+    },
   },
 };
 </script>
@@ -123,11 +193,19 @@ export default {
 }
 
 #project-config {
-  width: 50%;
+  width: $percent-width;
 }
 
 .config-title {
   font-size: 0.3rem;
+}
+
+.flex {
+  display: flex;
+}
+
+.icon-container {
+  justify-content: center;
 }
 
 .slider-font-item {
@@ -149,7 +227,7 @@ export default {
 
 .port-item {
   display: grid;
-  grid-template-columns: 35% 20% 35% 10%;
+  grid-template-columns: 35% 15% 35% 15%;
   margin-bottom: 15px;
 
   .port-font {
@@ -159,7 +237,7 @@ export default {
 
   .port-icon {
     text-align: right;
-    font-size: 0.5rem;
+    font-size: 0.6rem;
   }
 
   .port-icon:hover {

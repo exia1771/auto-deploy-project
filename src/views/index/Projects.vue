@@ -123,7 +123,6 @@
       id="project-dialog"
       :visible.sync="projectForm.visible"
       :close-on-click-modal="false"
-      width="35%"
     >
       <el-form
         :model="projectForm.form"
@@ -131,7 +130,7 @@
         ref="projectForm"
         status-icon
       >
-        <div id="form-select-container">
+        <div id="form-select-container" class="flex-container">
           <el-form-item
             class="select-item"
             label="选择模板"
@@ -177,12 +176,31 @@
           </el-form-item>
         </div>
 
-        <el-form-item label="工程名称" prop="name">
-          <el-input
-            v-model="projectForm.form.name"
-            autocomplete="off"
-          ></el-input>
-        </el-form-item>
+        <div class="flex-container">
+          <el-form-item label="名称空间" prop="namespace" class="select-item">
+            <el-select
+              v-model="projectForm.form.namespace"
+              filterable
+              placeholder="请选择"
+              :loading="namespaceOptions.loading"
+            >
+              <el-option
+                v-for="(item, index) in namespaceOptions.data"
+                :key="index"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="工程名称" prop="name" id="project-name">
+            <el-input
+              v-model="projectForm.form.name"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+        </div>
+
         <el-form-item
           label="工程标识 (数字、字母、英文减号、下划线) "
           prop="identification"
@@ -238,6 +256,10 @@ import {
   doFindPagedProjectsByKeyword,
   doDeleteProjectById,
 } from "../../service/project";
+import {
+  doFindDistinctNamespaces,
+  doSaveProjectConfig,
+} from "../../service/projectConfig";
 export default {
   name: "Projects",
   data() {
@@ -283,12 +305,18 @@ export default {
         loading: false,
         data: [],
       },
+      namespaceOptions: {
+        loading: false,
+        data: [],
+      },
       projectForm: {
         form: {
           name: "",
           username: "",
           identification: "",
           gitUrl: "",
+          configId: "",
+          namespace: "",
           description: "",
           templateName: "",
           templateTag: "",
@@ -306,6 +334,13 @@ export default {
               min: 1,
               max: 255,
               message: "长度在 1~255 个字符",
+              trigger: ["blur", "change"],
+            },
+          ],
+          namespace: [
+            {
+              required: true,
+              message: "请选择需要使用的名称空间",
               trigger: ["blur", "change"],
             },
           ],
@@ -385,6 +420,7 @@ export default {
   },
   created() {
     this.findDistinctTemplateName();
+    this.findDistinctNamespaces();
     this.findProjectsByCurrentUser();
   },
   methods: {
@@ -408,6 +444,21 @@ export default {
         return;
       }
       this.projectForm.loading = true;
+      await doSaveProjectConfig({
+        namespace: this.projectForm.form.namespace,
+      })
+        .then((res) => {
+          this.projectForm.form.configId = res.data.data.id;
+        })
+        .catch(() => {
+          this.projectForm.loading = false;
+          this.projectForm.form.configId = null;
+        });
+
+      if (this.projectForm.form.configId === null) {
+        return;
+      }
+
       doSaveProject({
         ...this.projectForm.form,
       })
@@ -513,8 +564,26 @@ export default {
     toSetting(project) {
       this.$router.push({
         name: "ProjectsSetting",
-        params: { id: project.id, name: project.name },
+        params: {
+          id: project.id,
+          name: project.name,
+          configId: project.configId,
+        },
       });
+    },
+    findDistinctNamespaces() {
+      this.namespaceOptions.data = [];
+      this.namespaceOptions.loading = true;
+      doFindDistinctNamespaces()
+        .then((res) => {
+          this.namespaceOptions.loading = false;
+          this.namespaceOptions.data = res.data.data.map((option) => {
+            return option.namespace;
+          });
+        })
+        .catch(() => {
+          this.namespaceOptions.loading = false;
+        });
     },
   },
 };
@@ -527,7 +596,7 @@ export default {
 }
 
 #project-dialog .el-dialog__body {
-  padding: 20px 10px 0 10px;
+  padding: 0px 10px 0 10px;
 }
 
 #project-dialog .el-dialog__footer {
@@ -567,12 +636,19 @@ export default {
 }
 
 #form-select-container {
-  display: flex;
   margin-top: 8px;
 }
 
 .select-item {
   flex: 1;
+}
+
+#project-name {
+  flex: 2;
+}
+
+.flex-container {
+  display: flex;
 }
 
 .button-group {

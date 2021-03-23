@@ -26,24 +26,7 @@ export function getOrDefault(o, value) {
 }
 
 export function objEqual(a, b) {
-    let aKeys = Object.keys(a);
-    let bKeys = Object.keys(b);
-
-    if (aKeys.length !== bKeys.length) {
-        return false;
-    }
-
-    for (let i = 0; i < aKeys.length; i++) {
-        const aEl = a[aKeys[i]];
-        const bEl = b[bKeys[i]];
-
-        if (aEl !== bEl) {
-            return false;
-        }
-
-    }
-
-    return true;
+    return JSON.stringify(a) === JSON.stringify(b);
 }
 
 export function dateFormatter(date) {
