@@ -29,11 +29,8 @@
           </el-form-item>
         </div>
 
-        <el-form-item label="所属用户" prop="username">
-          <el-input
-            v-model="basicInfoForm.username"
-            placeholder="请输入工程的简要概况"
-          ></el-input>
+        <el-form-item label="所属用户">
+          <el-input disabled :placeholder="basicInfoForm.username"></el-input>
         </el-form-item>
         <el-form-item label="Git地址">
           <el-input v-model="basicInfoForm.gitUrl" disabled></el-input>
@@ -129,19 +126,6 @@ export default {
           },
           {
             validator: checkIdentification,
-            trigger: ["blur", "change"],
-          },
-        ],
-        username: [
-          {
-            required: true,
-            message: "请输入项目所属用户",
-            trigger: ["blur", "change"],
-          },
-          {
-            min: 1,
-            max: 255,
-            message: "长度在 1~255 个字符",
             trigger: ["blur", "change"],
           },
         ],

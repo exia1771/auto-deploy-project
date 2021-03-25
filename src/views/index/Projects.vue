@@ -27,7 +27,7 @@
           plain
           @click="
             isSearch = false;
-            findProjectsByCurrentUser();
+            findPagedProjectsByCurrentUser();
           "
         >
           复原
@@ -81,6 +81,20 @@
                 circle
                 type="info"
                 icon="el-icon-setting"
+              ></el-button>
+            </el-tooltip>
+
+            <el-tooltip
+              effect="light"
+              content="成员配置"
+              placement="top"
+              class="button-group"
+            >
+              <el-button
+                plain
+                circle
+                type="success"
+                icon="el-icon-s-custom"
               ></el-button>
             </el-tooltip>
 
@@ -177,22 +191,6 @@
         </div>
 
         <div class="flex-container">
-          <el-form-item label="名称空间" prop="namespace" class="select-item">
-            <el-select
-              v-model="projectForm.form.namespace"
-              filterable
-              placeholder="请选择"
-              :loading="namespaceOptions.loading"
-            >
-              <el-option
-                v-for="(item, index) in namespaceOptions.data"
-                :key="index"
-                :label="item"
-                :value="item"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
           <el-form-item label="工程名称" prop="name" id="project-name">
             <el-input
               v-model="projectForm.form.name"
@@ -251,7 +249,6 @@ import {
   doSaveProject,
   doFindDistinctTemplateName,
   doFindTagsByTemplateName,
-  doFindProjectsByCurrentUser,
   doFindPagedProjectsByCurrentUser,
   doFindPagedProjectsByKeyword,
   doDeleteProjectById,
@@ -305,10 +302,6 @@ export default {
         loading: false,
         data: [],
       },
-      namespaceOptions: {
-        loading: false,
-        data: [],
-      },
       projectForm: {
         form: {
           name: "",
@@ -334,13 +327,6 @@ export default {
               min: 1,
               max: 255,
               message: "长度在 1~255 个字符",
-              trigger: ["blur", "change"],
-            },
-          ],
-          namespace: [
-            {
-              required: true,
-              message: "请选择需要使用的名称空间",
               trigger: ["blur", "change"],
             },
           ],
@@ -420,8 +406,7 @@ export default {
   },
   created() {
     this.findDistinctTemplateName();
-    this.findDistinctNamespaces();
-    this.findProjectsByCurrentUser();
+    this.findPagedProjectsByCurrentUser();
   },
   methods: {
     handleSizeChange(size) {
@@ -444,9 +429,7 @@ export default {
         return;
       }
       this.projectForm.loading = true;
-      await doSaveProjectConfig({
-        namespace: this.projectForm.form.namespace,
-      })
+      await doSaveProjectConfig({})
         .then((res) => {
           this.projectForm.form.configId = res.data.data.id;
         })
@@ -466,7 +449,7 @@ export default {
           this.projectForm.loading = false;
           this.projectForm.visible = false;
           this.$message.success("保存成功");
-          this.findProjectsByCurrentUser();
+          this.findPagedProjectsByCurrentUser();
         })
         .catch(() => {
           this.projectForm.loading = false;
@@ -497,19 +480,6 @@ export default {
           this.templateTagOptions.loading = false;
         });
     },
-    findProjectsByCurrentUser() {
-      this.tableLoading = true;
-      doFindProjectsByCurrentUser()
-        .then((res) => {
-          this.tableData = res.data.data.records;
-          this.tableLoading = false;
-          this.pageRequest.total = res.data.data.total;
-        })
-        .catch(() => {
-          this.tableLoading = false;
-          this.pageRequest.total = 0;
-        });
-    },
     changeProjectTemplateId(value) {
       this.projectForm.form.templateId = value;
     },
@@ -526,6 +496,10 @@ export default {
         });
     },
     findPagedProjectsByKeyword() {
+      if (this.searchText === null || this.searchText.trim().length === 0) {
+        return this.findPagedProjectsByCurrentUser();
+      }
+
       doFindPagedProjectsByKeyword(this.searchText, this.pageRequest)
         .then((res) => {
           this.tableData = res.data.data.records;
@@ -636,7 +610,7 @@ export default {
 }
 
 #form-select-container {
-  margin-top: 8px;
+  padding-top: 0.5rem;
 }
 
 .select-item {
