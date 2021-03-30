@@ -29,6 +29,8 @@ export function objEqual(a, b) {
     return JSON.stringify(a) === JSON.stringify(b);
 }
 
+const commonDatePattern = "YYYY-MM-DD HH:mm:ss";
+
 export function dateFormatter(date) {
-    return moment(date).add(8, 'hours').format("YYYY-MM-DD hh:mm:ss");
+    return moment(date).format(commonDatePattern);
 }

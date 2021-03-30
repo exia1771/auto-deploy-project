@@ -51,3 +51,6 @@ export async function doCheckSameName(name) {
     return axios.get(PUBLIC_USER_PATH + "/check" + "?name=" + name);
 }
 
+export function doFindUsersByDept(id) {
+    return axios.get(USER_PATH + `/dept/${id}`);
+}

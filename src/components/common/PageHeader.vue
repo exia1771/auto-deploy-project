@@ -18,7 +18,7 @@
         <div>
           <img
             v-if="user.avatarAddress"
-            :src="user.avatarAddress"
+            :src="fileServerURL + user.avatarAddress"
             class="avatar box-shadow"
             id="avatar-img"
           />
@@ -42,6 +42,7 @@
 <script>
 import { removeToken } from "../../utils/auth.js";
 import { doLogout } from "../../service/login";
+import { FILE_SERVER_URL } from "../../../config/global";
 export default {
   name: "PageHeader",
   components: {},
@@ -55,6 +56,7 @@ export default {
         color: "#000033",
         margin: "0 0 0 20px",
       },
+      fileServerURL: FILE_SERVER_URL,
     };
   },
   methods: {

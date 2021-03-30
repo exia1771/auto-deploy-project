@@ -8,7 +8,7 @@
         :rules="configInfoFormRules"
         label-width="90px"
       >
-        <el-form-item label="部署空间" prop="namespaceId">
+        <el-form-item label="名称空间" prop="namespaceId">
           <el-select
             v-model="configInfoForm.namespaceId"
             placeholder="请选择"
@@ -28,16 +28,6 @@
           <div class="slider-font-item">
             <el-slider
               v-model="configInfoForm.memory"
-              show-input
-              :max="2048"
-            ></el-slider>
-            <div class="slider-font">MB</div>
-          </div>
-        </el-form-item>
-        <el-form-item label="硬盘存储" prop="storage">
-          <div class="slider-font-item">
-            <el-slider
-              v-model="configInfoForm.storage"
               show-input
               :max="2048"
             ></el-slider>
@@ -131,7 +121,6 @@ export default {
         namespaceId: "",
         core: 0,
         memory: 0,
-        storage: 0,
         port: [{ container: null, host: null }],
       },
       configInfoFormRules: {
@@ -143,9 +132,6 @@ export default {
         ],
         memory: [
           { required: true, message: "请选择内存的大小", trigger: "blur" },
-        ],
-        storage: [
-          { required: true, message: "请选择硬盘的大小", trigger: "blur" },
         ],
       },
       configInfoFormLoading: false,
@@ -180,7 +166,6 @@ export default {
       ).then((res) => {
         const data = res.data.data;
         this.configInfoForm.memory = data.memory;
-        this.configInfoForm.storage = data.storage;
         this.configInfoForm.core = data.core;
         this.originConfigInfoForm = { ...this.configInfoForm };
         if (data.port != null || data.port != undefined) {

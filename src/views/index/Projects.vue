@@ -1,4 +1,4 @@
-<template>
+<template >
   <div id="project-container">
     <el-divider content-position="left">工程</el-divider>
     <div id="project-header">
@@ -95,6 +95,7 @@
                 circle
                 type="success"
                 icon="el-icon-s-custom"
+                @click="reviewMemberInfo(scope.row.id)"
               ></el-button>
             </el-tooltip>
 
@@ -240,6 +241,45 @@
         </el-button>
       </div>
     </el-dialog>
+
+    <el-dialog
+      id="member-tree-dialog"
+      :visible.sync="memberTree.visible"
+      :close-on-click-modal="false"
+    >
+      <div id="filter-text-input">
+        <el-input v-model="filterText" placeholder="展开后可过滤"></el-input>
+      </div>
+
+      <el-tree
+        v-loading.fullscrees.lock="fullScreenLoading"
+        :props="memberTree.members"
+        :load="loadNode"
+        :filter-node-method="filterNode"
+        node-key="id"
+        ref="memberTree"
+        lazy
+        show-checkbox
+        check-on-click-node
+      >
+      </el-tree>
+      <div slot="footer" class="dialog-footer">
+        <el-button
+          @click="
+            memberTree.visible = false;
+            filterText = '';
+          "
+          >取 消</el-button
+        >
+        <el-button
+          type="primary"
+          @click="addProjectMember"
+          :loading="memberTree.loading"
+        >
+          确 定
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -253,10 +293,9 @@ import {
   doFindPagedProjectsByKeyword,
   doDeleteProjectById,
 } from "../../service/project";
-import {
-  doFindDistinctNamespaces,
-  doSaveProjectConfig,
-} from "../../service/projectConfig";
+import * as DeptService from "../../service/dept";
+import * as ProjectUserService from "../../service/projectUser";
+import { doFindUsersByDept } from "../../service/login";
 export default {
   name: "Projects",
   data() {
@@ -402,13 +441,92 @@ export default {
         visible: false,
         loading: false,
       },
+      memberTree: {
+        visible: false,
+        projectId: "",
+        loading: false,
+        members: {
+          label: "name",
+          isLeaf: (data) => {
+            return data.type === "user";
+          },
+        },
+      },
+      filterText: "",
+      fullScreenLoading: true,
+      deptOptions: [],
     };
   },
   created() {
     this.findDistinctTemplateName();
     this.findPagedProjectsByCurrentUser();
+    this.findAllDept();
   },
   methods: {
+    async loadNode(node, resolve) {
+      if (node.level === 0) {
+        const deptList = this.deptOptions.map((value) => {
+          return {
+            name: value.name,
+            id: value.id,
+            type: "dept",
+          };
+        });
+        return resolve(deptList);
+      }
+      await doFindUsersByDept(node.data.id).then((res) => {
+        const data = res.data.data;
+        const userList = data.map((value) => {
+          return {
+            name: value.username,
+            id: value.id,
+            type: "user",
+          };
+        });
+        return resolve(userList);
+      });
+    },
+    async reviewMemberInfo(id) {
+      this.memberTree.projectId = id;
+      this.findUsersByProjectId();
+      this.fullScreenLoading = true;
+      this.memberTree.visible = true;
+    },
+    addProjectMember() {
+      const userIdList = this.$refs.memberTree.getCheckedKeys(true);
+      this.memberTree.loading = true;
+      ProjectUserService.doBatchUpdate(this.memberTree.projectId, userIdList)
+        .then(() => {
+          this.memberTree.loading = false;
+          this.$message.success("成员修改成功");
+          this.memberTree.visible = false;
+        })
+        .catch(() => {
+          this.memberTree.loading = false;
+        });
+    },
+    filterNode(value, data) {
+      if (value === "" || value.trim().length === 0) {
+        return true;
+      } else {
+        return data.name.indexOf(value) !== -1;
+      }
+    },
+    findUsersByProjectId() {
+      ProjectUserService.doFindUsersByProjectId(this.memberTree.projectId)
+        .then((res) => {
+          this.$refs.memberTree.setCheckedKeys(res.data.data);
+          this.fullScreenLoading = false;
+        })
+        .catch(() => {
+          this.fullScreenLoading = false;
+        });
+    },
+    findAllDept() {
+      DeptService.doFindAll().then((res) => {
+        this.deptOptions = res.data.data;
+      });
+    },
     handleSizeChange(size) {
       this.pageRequest.size = size;
       this.pageAll();
@@ -429,18 +547,6 @@ export default {
         return;
       }
       this.projectForm.loading = true;
-      await doSaveProjectConfig({})
-        .then((res) => {
-          this.projectForm.form.configId = res.data.data.id;
-        })
-        .catch(() => {
-          this.projectForm.loading = false;
-          this.projectForm.form.configId = null;
-        });
-
-      if (this.projectForm.form.configId === null) {
-        return;
-      }
 
       doSaveProject({
         ...this.projectForm.form,
@@ -545,19 +651,10 @@ export default {
         },
       });
     },
-    findDistinctNamespaces() {
-      this.namespaceOptions.data = [];
-      this.namespaceOptions.loading = true;
-      doFindDistinctNamespaces()
-        .then((res) => {
-          this.namespaceOptions.loading = false;
-          this.namespaceOptions.data = res.data.data.map((option) => {
-            return option.namespace;
-          });
-        })
-        .catch(() => {
-          this.namespaceOptions.loading = false;
-        });
+  },
+  watch: {
+    filterText(val) {
+      this.$refs.memberTree.filter(val);
     },
   },
 };
@@ -575,6 +672,10 @@ export default {
 
 #project-dialog .el-dialog__footer {
   padding: 0 10px 10px 10px;
+}
+
+#member-tree-dialog {
+  top: 0;
 }
 </style>
 
@@ -627,5 +728,9 @@ export default {
 
 .button-group {
   margin: 0 5px;
+}
+
+#filter-text-input {
+  margin-bottom: 0.7rem;
 }
 </style>

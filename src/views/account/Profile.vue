@@ -49,7 +49,7 @@
         >
           <img
             v-if="user.avatarAddress"
-            :src="user.avatarAddress"
+            :src="fileServerURL + user.avatarAddress"
             class="avatar box-shadow"
             id="avatar-img"
           />
@@ -66,6 +66,7 @@ import { nullToBlank, getOrDefault } from "../../utils/common.js";
 import { doUpdateBasicInfo } from "../../service/account";
 import { USER_PATH } from "../../service/login";
 import { setUser } from "../../utils/auth";
+import { FILE_SERVER_URL } from "../../../config/global";
 export default {
   name: "Profile",
   data() {
@@ -86,6 +87,7 @@ export default {
       }
     };
     return {
+      fileServerURL: FILE_SERVER_URL,
       form: {},
       updateForm: {},
       updateFormRules: {
