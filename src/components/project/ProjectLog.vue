@@ -27,6 +27,9 @@
             >
             </el-date-picker>
             <el-button @click="findContainerLog()">查找</el-button>
+            <el-button @click="getContainerStream" type="primary"
+              >下载</el-button
+            >
           </div>
           <el-input
             class="log-container"
@@ -47,6 +50,7 @@
 import {
   doFindBuildLog,
   doFindContainerLog,
+  doGetContainerLogStream,
 } from "../../service/projectContainer";
 export default {
   name: "ProjectLog",
@@ -95,6 +99,22 @@ export default {
         .catch(() => {
           this.fullScreenLoading = false;
         });
+    },
+    getContainerStream() {
+      const since = Math.round(this.since.getTime() / 1000);
+      doGetContainerLogStream(this.projectContainerId, since).then((res) => {
+        const blob = new Blob([res.data]);
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onload = (e) => {
+          let a = document.createElement("a");
+          a.download = res.headers["content-disposition"];
+          a.href = e.target.result;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        };
+      });
     },
     tabClick(e) {
       if (e.name === "container") {

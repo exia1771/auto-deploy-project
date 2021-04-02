@@ -165,7 +165,6 @@
             content="重新部署"
             placement="top"
             class="button-group"
-            v-if="scope.row.status === 1"
           >
             <el-button
               @click="reDeploy(scope.row.id)"
@@ -252,7 +251,7 @@
             v-model="infoForm.buildCommand"
           ></el-input>
         </el-form-item>
-        <el-form-item label="拷贝到容器目录">
+        <el-form-item label="拷贝到容器(当前所在目录:/)">
           <el-input
             autocomplete="off"
             disabled
@@ -441,7 +440,7 @@ export default {
     },
     restartContainer(id) {
       doRestartContainer(id).then((res) => {
-        this.$message.info(res.data.data);
+        this.$message.success(res.data.data);
       });
     },
   },

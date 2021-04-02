@@ -39,3 +39,7 @@ export function doFindContainerLog(id, since) {
 export function doRestartContainer(id) {
     return axios.post(PROJECT_CONTAINER_PATH + `/restart/${id}`);
 }
+
+export function doGetContainerLogStream(id, since){
+    return axios.post(PROJECT_CONTAINER_PATH + `/log?id=${id}&since=${since}`, null, {responseType:'blob'});
+}

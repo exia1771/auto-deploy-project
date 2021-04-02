@@ -54,11 +54,22 @@
         <el-form-item label="工程构建命令" prop="buildCommand">
           <el-input type="textarea" v-model="form.buildCommand"></el-input>
         </el-form-item>
-        <el-form-item label="拷贝至容器目录" prop="cpToContainerPath">
+        <el-form-item label="拷贝到容器" prop="cpToContainerPath">
           <el-input v-model="form.cpToContainerPath"></el-input>
         </el-form-item>
-        <el-form-item label="工程运行命令" prop="runCommand">
-          <el-input type="textarea" v-model="form.runCommand"></el-input>
+        <el-form-item
+          prop="runCommand"
+          label="工程运行命令"
+          id="run-command-container"
+        >
+          <el-tooltip
+            class="item"
+            effect="light"
+            content="请注意默认工作目录为'/'"
+            placement="bottom-end"
+          >
+            <el-input type="textarea" v-model="form.runCommand"></el-input>
+          </el-tooltip>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -211,5 +222,5 @@ export default {
 </script>
 
 
-<style scoped>
+<style scoped  lang="scss">
 </style>
